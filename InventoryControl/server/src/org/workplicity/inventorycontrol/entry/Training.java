@@ -25,6 +25,9 @@ public class Training extends Entry {
     private Date date;
     private String trainer;
 
+    public Training() {
+    }
+
     /**
      * @return the status
      */
