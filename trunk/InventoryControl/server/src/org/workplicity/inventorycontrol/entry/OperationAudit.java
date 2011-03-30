@@ -18,6 +18,9 @@ public class OperationAudit extends Entry {
     private Date stamp;
     private Integer location;
 
+    public OperationAudit() {
+    }
+
     /**
      * @return the status
      */

@@ -19,6 +19,9 @@ public class OrderAudit extends Entry {
     private String poNumber;
     private String orderNumber;
 
+    public OrderAudit() {
+    }
+
     /**
      * @return the stamp
      */

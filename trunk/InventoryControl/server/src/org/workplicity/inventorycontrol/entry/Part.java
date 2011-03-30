@@ -13,6 +13,9 @@ public class Part extends Stock {
     private static final long serialVersionUID = -6482381378329769196L;
     private Integer modelId;
 
+    public Part() {
+    }
+
     /**
      * @return the modelId
      */

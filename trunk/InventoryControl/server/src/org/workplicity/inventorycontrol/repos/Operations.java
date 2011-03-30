@@ -13,7 +13,7 @@ import org.workplicity.repos.Repository;
  */
 public class Operations extends Repository<OperationAudit> {
 
-    private static String TITLE = "Operations";
+     public final static String TITLE = "Operations";
 
     /**
      * Constructor

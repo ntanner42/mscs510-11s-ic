@@ -13,7 +13,7 @@ import org.workplicity.repos.Repository;
  */
 public class Events extends Repository<Event> {
 
-    private static String TITLE = "Events";
+     public final static String TITLE = "Events";
 
     /**
      * Constructor

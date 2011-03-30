@@ -13,7 +13,7 @@ import org.workplicity.repos.Repository;
  */
 public class Locations extends Repository<Location> {
 
-    private static String TITLE = "Locations";
+     public final static String TITLE = "Locations";
 
     /**
      * Constructor

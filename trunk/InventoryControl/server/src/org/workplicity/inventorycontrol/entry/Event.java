@@ -5,6 +5,7 @@
 package org.workplicity.inventorycontrol.entry;
 
 import org.workplicity.entry.Entry;
+import org.workplicity.entry.WorkRequest;
 
 /**
  *
@@ -12,7 +13,7 @@ import org.workplicity.entry.Entry;
  */
 public class Event extends Entry {
 
-    private WorkOrder template;
+    private WorkRequest template;
     private Integer workSlateId;
     private Boolean fired;
     private Boolean enabled;
@@ -65,14 +66,14 @@ public class Event extends Entry {
     /**
      * @return WorkOrder
      */
-    public WorkOrder getTemplate() {
+    public WorkRequest getTemplate() {
         return this.template;
     }
 
     /**
      * @param
      */
-    public void setTemplate(WorkOrder template) {
+    public void setTemplate(WorkRequest template) {
         this.template = template;
     }
 }

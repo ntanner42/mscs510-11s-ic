@@ -6,6 +6,7 @@ package org.workplicity.inventorycontrol.entry;
 
 import java.util.ArrayList;
 import org.workplicity.entry.Entry;
+import org.workplicity.repos.Repository;
 
 /**
  *
@@ -25,21 +26,25 @@ public class Item extends Entry {
     private String oem;
     private String modelNumber;
     private Integer inventoryId;
-    private ArrayList<Stock> supplies = new ArrayList<Stock>();
+    private Repository<Stock> supplies;
     private ArrayList<Training> trainings = new ArrayList<Training>();
     private ArrayList<OrderAudit> orderHistory = new ArrayList<OrderAudit>();
     private Integer stockThreshold = 0;
     private boolean trigger = false;
     private Integer reorderEventId = -1;
     private Status countIf = Status.IN_STOCK;
-    private ItemType itemType;
 
+    public Item() {
+    }
+
+    
     /**
      * @return the name
      */
     public String getName() {
         return name;
     }
+
 
     /**
      * @param name the name to set
@@ -107,15 +112,15 @@ public class Item extends Entry {
     /**
      * @return the supplies
      */
-    public ArrayList<Stock> getSupplies() {
+    public Repository<Stock> getSupplies() {
         return supplies;
     }
 
     /**
      * @param supplies the supplies to set
      */
-    public void setSupplies(ArrayList<Stock> supplies) {
-        this.supplies = supplies;
+    public void setSupplies(Repository<Stock> supplies) {
+        this.setSupplies(supplies);
     }
 
     /**
@@ -174,17 +179,32 @@ public class Item extends Entry {
         this.countIf = countIf;
     }
 
+
     /**
-     * @return the itemType
+     * @return the trainings
      */
-    public ItemType getItemType() {
-        return itemType;
+    public ArrayList<Training> getTrainings() {
+        return trainings;
     }
 
     /**
-     * @param itemType the itemType to set
+     * @param trainings the trainings to set
      */
-    public void setItemType(ItemType itemType) {
-        this.itemType = itemType;
+    public void setTrainings(ArrayList<Training> trainings) {
+        this.trainings = trainings;
+    }
+
+    /**
+     * @return the orderHistory
+     */
+    public ArrayList<OrderAudit> getOrderHistory() {
+        return orderHistory;
+    }
+
+    /**
+     * @param orderHistory the orderHistory to set
+     */
+    public void setOrderHistory(ArrayList<OrderAudit> orderHistory) {
+        this.orderHistory = orderHistory;
     }
 }

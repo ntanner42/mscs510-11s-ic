@@ -7,6 +7,7 @@ package org.workplicity.inventorycontrol.entry;
 import java.util.ArrayList;
 import java.util.List;
 import org.workplicity.entry.Entry;
+import org.workplicity.repos.Repository;
 
 /**
  *
@@ -16,8 +17,8 @@ public class Inventory extends Entry {
 
     private static final long serialVersionUID = -6482381378329769196L;
     protected String name;
-    protected List<Integer> items = new ArrayList<Integer>();
-    protected List<Integer> services = new ArrayList<Integer>();
+    protected Repository<Item>  items;
+    protected List<Integer>  services = new ArrayList<Integer>();
 
     public Inventory() {
     }
@@ -39,14 +40,14 @@ public class Inventory extends Entry {
     /**
      * @return the items
      */
-    public List<Integer> getItems() {
+    public Repository<Item> getItems() {
         return items;
     }
 
     /**
      * @param items the items to set
      */
-    public void setItems(List<Integer> items) {
+    public void setItems(Repository<Item> items) {
         this.items = items;
     }
 

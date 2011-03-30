@@ -21,6 +21,9 @@ public class Stock extends Entry {
     private Integer itemId;
     private ArrayList<OperationAudit> operationHistory = new ArrayList<OperationAudit>();
 
+    public Stock() {
+    }
+
     /**
      * @return the partNumber
      */
