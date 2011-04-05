@@ -6,21 +6,21 @@ package org.workplicity.inventorycontrol.entry;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.workplicity.entry.Entry;
 import org.workplicity.repos.Repository;
 
 /**
  *
  * @author Uday
  */
-public class Inventory extends Entry {
+public class Inventory extends Repository<Item> {
 
     private static final long serialVersionUID = -6482381378329769196L;
     protected String name;
-    protected Repository<Item>  items;
+    private String description;
     protected List<Integer>  services = new ArrayList<Integer>();
 
-    public Inventory() {
+    public Inventory(String title) {
+        super(title);
     }
 
     /**
@@ -38,20 +38,6 @@ public class Inventory extends Entry {
     }
 
     /**
-     * @return the items
-     */
-    public Repository<Item> getItems() {
-        return items;
-    }
-
-    /**
-     * @param items the items to set
-     */
-    public void setItems(Repository<Item> items) {
-        this.items = items;
-    }
-
-    /**
      * @return the services
      */
     public List<Integer> getServices() {
@@ -63,5 +49,19 @@ public class Inventory extends Entry {
      */
     public void setServices(List<Integer> services) {
         this.services = services;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

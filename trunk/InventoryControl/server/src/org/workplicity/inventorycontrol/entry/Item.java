@@ -5,14 +5,13 @@
 package org.workplicity.inventorycontrol.entry;
 
 import java.util.ArrayList;
-import org.workplicity.entry.Entry;
 import org.workplicity.repos.Repository;
 
 /**
  *
  * @author SHAN
  */
-public class Item extends Entry {
+public class Item extends Repository<Stock> {
 
     private static long serialVersionUID = -6482381378329769196L;
 
@@ -26,7 +25,6 @@ public class Item extends Entry {
     private String oem;
     private String modelNumber;
     private Integer inventoryId;
-    private Repository<Stock> supplies;
     private ArrayList<Training> trainings = new ArrayList<Training>();
     private ArrayList<OrderAudit> orderHistory = new ArrayList<OrderAudit>();
     private Integer stockThreshold = 0;
@@ -34,7 +32,8 @@ public class Item extends Entry {
     private Integer reorderEventId = -1;
     private Status countIf = Status.IN_STOCK;
 
-    public Item() {
+    public Item(String title) {
+        super(title);
     }
 
     
@@ -107,20 +106,6 @@ public class Item extends Entry {
      */
     public void setInventoryId(Integer inventoryId) {
         this.inventoryId = inventoryId;
-    }
-
-    /**
-     * @return the supplies
-     */
-    public Repository<Stock> getSupplies() {
-        return supplies;
-    }
-
-    /**
-     * @param supplies the supplies to set
-     */
-    public void setSupplies(Repository<Stock> supplies) {
-        this.setSupplies(supplies);
     }
 
     /**
