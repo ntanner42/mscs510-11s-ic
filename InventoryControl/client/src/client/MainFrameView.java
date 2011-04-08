@@ -5,16 +5,13 @@
 package client;
 
 import org.jdesktop.application.Action;
-import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
-import org.jdesktop.application.TaskMonitor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.Timer;
-import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableColumn;
 
 /**
  * The application's main frame.
@@ -24,10 +21,38 @@ public class MainFrameView extends FrameView {
     public MainFrameView(SingleFrameApplication app) {
         super(app);
 
-        initComponents();
+        // Attempt to set the appearance to the system default
+        try
+        {
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Failed to set the look and feel.");
+        }
 
+        initComponents();
+        initInventoriesTable();
     }
 
+    private void initInventoriesTable()
+    {
+        // Fix the column widths
+        inventoriesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        final int[] WIDTHS = {
+             40,  // Id
+             80,  // Updated
+            130,  // Name
+            214,  // Description
+        };
+
+        for(int i=0; i < WIDTHS.length; i++) {
+            TableColumn col = inventoriesTable.getColumnModel().getColumn(i);
+
+            col.setPreferredWidth(WIDTHS[i]);
+        }
+    }
     @Action
     public void showAboutBox() {
         if (aboutBox == null) {
@@ -58,6 +83,7 @@ public class MainFrameView extends FrameView {
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         adminMenu = new javax.swing.JMenu();
+        locationsMenuItem = new javax.swing.JMenuItem();
         usersMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
@@ -66,36 +92,46 @@ public class MainFrameView extends FrameView {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        inventoriesTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Id", "Updated", "Name", "Description"
-            }
-        ));
+        inventoriesTable.setModel(new InventoriesTableModel());
         inventoriesTable.setName("inventoriesTable"); // NOI18N
         jScrollPane1.setViewportView(inventoriesTable);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(MainFrameView.class);
-        inventoriesTable.getColumnModel().getColumn(0).setHeaderValue(resourceMap.getString("inventoriesTable.columnModel.title0")); // NOI18N
-        inventoriesTable.getColumnModel().getColumn(1).setHeaderValue(resourceMap.getString("inventoriesTable.columnModel.title1")); // NOI18N
-        inventoriesTable.getColumnModel().getColumn(2).setHeaderValue(resourceMap.getString("inventoriesTable.columnModel.title2")); // NOI18N
-        inventoriesTable.getColumnModel().getColumn(3).setHeaderValue(resourceMap.getString("inventoriesTable.columnModel.title3")); // NOI18N
 
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(MainFrameView.class);
+        byeButton.setIcon(resourceMap.getIcon("byeButton.icon")); // NOI18N
         byeButton.setText(resourceMap.getString("byeButton.text")); // NOI18N
         byeButton.setName("byeButton"); // NOI18N
+        byeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                byeButtonActionPerformed(evt);
+            }
+        });
 
+        refreshButton.setIcon(resourceMap.getIcon("refreshButton.icon")); // NOI18N
         refreshButton.setText(resourceMap.getString("refreshButton.text")); // NOI18N
         refreshButton.setName("refreshButton"); // NOI18N
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshButtonActionPerformed(evt);
+            }
+        });
 
+        deleteButton.setIcon(resourceMap.getIcon("deleteButton.icon")); // NOI18N
         deleteButton.setText(resourceMap.getString("deleteButton.text")); // NOI18N
         deleteButton.setName("deleteButton"); // NOI18N
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
 
+        addButton.setIcon(resourceMap.getIcon("addButton.icon")); // NOI18N
         addButton.setText(resourceMap.getString("addButton.text")); // NOI18N
         addButton.setName("addButton"); // NOI18N
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
@@ -107,7 +143,7 @@ public class MainFrameView extends FrameView {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
                         .addComponent(refreshButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteButton)
@@ -121,12 +157,13 @@ public class MainFrameView extends FrameView {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(byeButton)
-                    .addComponent(refreshButton)
-                    .addComponent(deleteButton)
-                    .addComponent(addButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(byeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(refreshButton)
+                        .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(deleteButton))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -142,10 +179,23 @@ public class MainFrameView extends FrameView {
         menuBar.add(fileMenu);
 
         adminMenu.setText(resourceMap.getString("adminMenu.text")); // NOI18N
-        adminMenu.setName("adminMenu"); // NOI18N
+
+        locationsMenuItem.setText(resourceMap.getString("locationsMenuItem.text")); // NOI18N
+        locationsMenuItem.setName("locationsMenuItem"); // NOI18N
+        locationsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                locationsMenuItemActionPerformed(evt);
+            }
+        });
+        adminMenu.add(locationsMenuItem);
 
         usersMenuItem.setText(resourceMap.getString("usersMenuItem.text")); // NOI18N
         usersMenuItem.setName("usersMenuItem"); // NOI18N
+        usersMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usersMenuItemActionPerformed(evt);
+            }
+        });
         adminMenu.add(usersMenuItem);
 
         menuBar.add(adminMenu);
@@ -163,6 +213,46 @@ public class MainFrameView extends FrameView {
         setMenuBar(menuBar);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try
+                {
+                    // Displays add item dialog
+                    AddInventoryDialog inventoryDialog =
+                            new AddInventoryDialog( null , true);
+
+                    inventoryDialog.setVisible(true);
+                } catch (Exception e) {
+                    //Logger.log(e.toString());
+                }
+            }
+        });
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_refreshButtonActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void byeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_byeButtonActionPerformed
+        this.getFrame().dispose();
+    }//GEN-LAST:event_byeButtonActionPerformed
+
+    private void locationsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationsMenuItemActionPerformed
+        LocationsDialog dialog = new LocationsDialog(this.getFrame(), true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_locationsMenuItemActionPerformed
+
+    private void usersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usersMenuItemActionPerformed
+        UsersDialog dialog = new UsersDialog(this.getFrame(), true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_usersMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JMenu adminMenu;
@@ -170,6 +260,7 @@ public class MainFrameView extends FrameView {
     private javax.swing.JButton deleteButton;
     private javax.swing.JTable inventoriesTable;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem locationsMenuItem;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton refreshButton;

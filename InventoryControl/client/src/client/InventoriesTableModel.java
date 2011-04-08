@@ -5,10 +5,14 @@
 
 package client;
 
+/**
+ *
+ * @author Neal
+ */
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
-import org.workplicity.inventorycontrol.entry.Item;
+import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
 
@@ -16,16 +20,15 @@ import org.workplicity.worklet.WorkletContext;
  *
  * @author Neal
  */
-public class ItemsTableModel extends AbstractTableModel
+public class InventoriesTableModel extends AbstractTableModel
 {
-    private ArrayList<Item> items = new ArrayList<Item>( );
-    private HashMap<Integer,Item> dirty = new HashMap<Integer,Item>( );
+    private ArrayList<Inventory> inventories = new ArrayList<Inventory>( );
+    private HashMap<Integer,Inventory> dirty = new HashMap<Integer,Inventory>( );
 
     private static String[] columnNames =
     {
         "Id",
         "Updated",
-        "Model #",
         "Name",
         "Description"
     };
@@ -38,7 +41,7 @@ public class ItemsTableModel extends AbstractTableModel
 
     public int getRowCount()
     {
-        return items.size();
+        return inventories.size();
     }
 
     public int getColumnCount()
@@ -61,7 +64,7 @@ public class ItemsTableModel extends AbstractTableModel
 
     public Object getValueAt(int row, int col)
     {
-        Item item = items.get(row);
+        Inventory inventory = inventories.get(row);
 
         Object valueToReturn = null;
 
@@ -69,7 +72,7 @@ public class ItemsTableModel extends AbstractTableModel
         {
             String indicator = "";
 
-            Integer id = item.getId();
+            Integer id = inventory.getId();
 
             if(dirty.get(id) != null)
             {
@@ -81,23 +84,18 @@ public class ItemsTableModel extends AbstractTableModel
         }
         else if(col == 1)
         {
-            //valueToReturn = item.getUpdateDate();
+            //valueToReturn = inventory.getUpdateDate();
             valueToReturn = "12/04/2010";
         }
         else if(col == 2)
         {
-            //valueToReturn = item.getModelNumber();
-            valueToReturn = "ASF500";
+            //valueToReturn = inventory.getName();
+            valueToReturn = "Vacuums";
         }
         else if(col == 3)
         {
-            //valueToReturn = item.getName();
-            valueToReturn = "Hoover";
-        }
-        else if(col == 4)
-        {
-            //valueToReturn = item.getDescription();
-            valueToReturn = "It's a Hoover, Jim";
+            //valueToReturn = inventory.getDescription();
+            valueToReturn = "All the vacuums";
         }
 
         return valueToReturn;
@@ -105,22 +103,18 @@ public class ItemsTableModel extends AbstractTableModel
     @Override
     public void setValueAt(Object value, int row, int col)
     {
-        Item item = getRow(row);
-
+        Inventory inventory = getRow(row);
+        
         if(col == 2)
         {
-            item.setModelNumber((String)value);
+            inventory.setName((String)value);
         }
         else if(col == 3)
         {
-            item.setName((String)value);
-        }
-        else if(col == 4)
-        {
-            item.setDescription((String)value);
+            //inventory.setDescription((String)value);
         }
 
-        dirty.put(item.getId(),item);
+        dirty.put(inventory.getId(),inventory);
 
         this.fireTableDataChanged();
     }
@@ -129,19 +123,19 @@ public class ItemsTableModel extends AbstractTableModel
     {
         WorkletContext context = WorkletContext.getInstance();
 
-        items = Helper.query("Items", "/list", context);
+        inventories = Helper.query("Items", "/list", context);
 
         dirty.clear();
 
         this.fireTableDataChanged();
     }
 
-    public Item getRow(int row)
+    public Inventory getRow(int row)
     {
-        return items.get(row);
+        return inventories.get(row);
     }
 
-    public HashMap<Integer,Item> getDirty()
+    public HashMap<Integer,Inventory> getDirty()
     {
         return dirty;
     }
