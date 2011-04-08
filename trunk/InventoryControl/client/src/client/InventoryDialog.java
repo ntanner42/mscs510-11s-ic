@@ -14,6 +14,7 @@ package client;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 /**
@@ -68,7 +69,7 @@ public class InventoryDialog extends javax.swing.JDialog {
 
     private void initItemsTable()
     {
-                // Fix the column widths
+        // Fix the column widths
         itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         final int[] WIDTHS = {
@@ -189,10 +190,10 @@ public class InventoryDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(deleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(deleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -204,7 +205,23 @@ public class InventoryDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        // Add add code here
+        final InventoryDialog dialog = this;
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try
+                {
+                    // Displays add item dialog
+                    AddItemDialog itemDialog =
+                            new AddItemDialog( null , true);
+
+                    itemDialog.setVisible(true);
+                } catch (Exception e) {
+                    //Logger.log(e.toString());
+                }
+            }
+        });
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
@@ -212,7 +229,7 @@ public class InventoryDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-        // Add done code here
+        this.dispose();
     }//GEN-LAST:event_doneButtonActionPerformed
 
     /**
