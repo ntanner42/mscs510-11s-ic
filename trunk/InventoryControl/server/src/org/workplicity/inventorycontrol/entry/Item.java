@@ -17,7 +17,7 @@ public class Item extends Repository<Stock> {
 
     public enum Status {
 
-        RECEIVED, IN_STOCK, IN_SERVICE, RETURNED, PM, REPAIR,
+        NEW, RECEIVED, IN_STOCK, IN_SERVICE, RETURNED, PM, REPAIR,
         RETIRED, EXPENDED
     };
     private String name;
