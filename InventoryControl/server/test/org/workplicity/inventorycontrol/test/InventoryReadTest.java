@@ -27,8 +27,7 @@ public class InventoryReadTest extends Test {
             
             String criteria1 = "/list";
             //Issuing the query using the helper to the Inventories repository
-            ArrayList<Inventory> list =
-                    Helper.query("Inventories", criteria1, context);
+            ArrayList<Inventory> list = Helper.query("Inventories", criteria1, context);
             if (list == null) {
                 throw new Exception("bad query");
             }
