@@ -33,16 +33,9 @@ public class ItemCreateTest extends Test {
             ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
             //Create 100 random Items  and add to each Inventory
             
-            // create a counter
-            int i=0;
             for (Inventory inventory : inventories) {
                 
                 String suffix = "";
-
-                if(i>0) {
-                    // add security suffix for security items only
-                    suffix = " Security";
-                }
 
                 // create arrays to hold data to insert into items
                 String[] names = {"Clean View Helix", "Halo UV", "Ball Vac", "Floor Waxer", "Floor Striper"};
@@ -51,20 +44,27 @@ public class ItemCreateTest extends Test {
                 String[] models = {"21K3", "85541", "ABC123", "EEB2333", "232BC"};
                 Integer[] sts = {5, 5, 2, 2, 1};
                 
+                for(int i=0; i<names.length; i++) {
+                    if(i>0) {
+                        // add security suffix for security items only
+                        suffix = " Security";
+                    }
+
+                    Item item = new Item(names[i] + suffix);
+
+                    item.setName(names[i] + suffix);
+                    item.setDescription(descriptions[i]);
+                    item.setOem(oems[i]);
+                    item.setModelNumber(models[i]);
+                    item.setInventoryId(inventory.getId());
+                    item.setStockThreshold(sts[i]);
+
+                    inventory.insert(item);
+
+                    if (!Helper.insert(inventory, "Inventories", context)) {
+                        System.out.println("insert Item into Inventory failed!");
+                    }
                 
-                Item item = new Item(names[i] + suffix);
-
-                item.setName(names[i] + suffix);
-                item.setDescription(descriptions[i]);
-                item.setOem(oems[i]);
-                item.setModelNumber(models[i]);
-                item.setInventoryId(inventory.getId());
-                item.setStockThreshold(sts[i]);
-
-                inventory.insert(item);
-
-                if (!Helper.insert(inventory, "Inventories", context)) {
-                    System.out.println("insert Item into Inventory failed!");
                 }
             }
             System.out.print("Insert finished");
