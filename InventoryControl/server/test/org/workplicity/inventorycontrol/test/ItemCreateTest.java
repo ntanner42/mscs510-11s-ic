@@ -60,11 +60,16 @@ public class ItemCreateTest extends Test {
                     item.setStockThreshold(sts[i]);
 
                     inventory.insert(item);
+                    
+                    
+                    System.out.println(item.getId());
 
-                    if (!Helper.insert(inventory, "Inventories", context)) {
+                    if (!Helper.insert(item, "Inventories", context)) {
                         System.out.println("insert Item into Inventory failed!");
                     }
-                
+
+                    System.out.println(item.getId());
+                   
                 }
             }
             System.out.print("Insert finished");
