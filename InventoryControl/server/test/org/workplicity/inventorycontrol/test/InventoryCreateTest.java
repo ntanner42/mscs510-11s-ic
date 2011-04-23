@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -15,6 +15,7 @@ import org.workplicity.worklet.WorkletContext;
 /**
  *
  * @author SHAN
+ * @author Brian Gormanly
  */
 public class InventoryCreateTest {
 
@@ -35,7 +36,7 @@ public class InventoryCreateTest {
     public static void main(String[] args) {
         try {
             // Disable logging which goes to the console.
-            Logger.setEnabled(false);
+            //Logger.setEnabled(false);
 
             // Set the host to use.
             NetTask.setUrlBase(URL_BASE);
@@ -45,28 +46,26 @@ public class InventoryCreateTest {
             if (!Helper.login("admin", "gaze11e", context)) {
                 throw new Exception("login failed");
             }
-            //Creating 100 inventories
-            for (int i = 0; i < 100; i++) {
+            //Create array of names
+            String[] names = {"Main College Inventory", "Security Inventory"};
+            
+            //Create array of descriptions
+            String[] descriptions = {"All Items that belong to the main College inventory", "Items that are managed by the security force only"};
+            
+            
+            for (int i = 0; i < names.length; i++) {
                 Inventory inventory = new Inventory("Inventory" + i);
 
-                Random random = new Random();
-
-                String name = "" + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65)
-                        + (char) (random.nextInt(26) + 65);
-                inventory.setName(name);
-                inventory.setDescription(name);
+                inventory.setName(names[i]);
+                inventory.setDescription(descriptions[i]);
+                
+                System.out.println(inventory.getId());
 
                 if (!Helper.insert(inventory, "Inventories", context)) {
                     System.out.println("insert Item into Inventory failed!");
                 }
+                
+                System.out.println(inventory.getId());
             }
             System.out.print("Insert finished");
         } catch (Exception e) {

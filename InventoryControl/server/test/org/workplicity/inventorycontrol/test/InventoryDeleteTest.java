@@ -47,8 +47,7 @@ public class InventoryDeleteTest {
             }
             String criteria1 = "/ list";
             //Issuing the query using the helper to the Inventories repository
-            ArrayList<Inventory> list =
-                    Helper.query("Inventories", criteria1, context);
+            ArrayList<Inventory> list = Helper.query("Inventories", criteria1, context);
             //deleting all inventories
             for (Inventory inventory : list) {
                 if (!Helper.delete(inventory, "Inventories", context)) {
