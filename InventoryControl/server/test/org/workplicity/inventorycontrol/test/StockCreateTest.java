@@ -20,12 +20,9 @@ public class StockCreateTest extends Test {
 
     public StockCreateTest() {
         super();
-    }
-    
-    public static void main(String[] args) {
+        
         try {
-            StockCreateTest thisTest = new StockCreateTest();
-            
+ 
             String criteria1 = "/list";
             //Issuing the query using the helper to the Inventories repository
             ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
@@ -49,7 +46,7 @@ public class StockCreateTest extends Test {
                             String[] partNumbers = {"1Z123" + i + j, "1Z234" + i + j, "1Z345" + i + j, "1Z456" + i + j};
                             String[] serialNumbers = {"2346543" + i + j, "3458343" + i + j, "2345673" + i + j, "2323434" + i + j};
                             String[] assetTags = {"111" + i + j, "222" + i + j, "333" + i + j, "444" + i + j};
-                            if(j>4) {
+                            if(j>3) {
                                 String[] rmaNumbers = {"", "234234252Z2" + i + j, "", ""};
                             }
                             else {
@@ -99,5 +96,11 @@ public class StockCreateTest extends Test {
         catch (Exception e) {
             System.out.println(e);
         }
+    }
+    
+    public static void main(String[] args) {
+        StockCreateTest thisTest = new StockCreateTest();
+        
+        
     }
 }

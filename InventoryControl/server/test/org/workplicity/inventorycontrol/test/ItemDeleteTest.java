@@ -21,14 +21,7 @@ public class ItemDeleteTest extends Test {
     
     public ItemDeleteTest() {
         super();
-        
-    }
-
-   
-    public static void main(String[] args) {
-        try {
-            
-            ItemDeleteTest thisItem = new ItemDeleteTest();
+        try { 
             
             String criteria1 = "/ list";
             //Issuing the query using the helper to the Inventories repository
@@ -50,5 +43,11 @@ public class ItemDeleteTest extends Test {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+   
+    public static void main(String[] args) {
+        ItemDeleteTest thisItem = new ItemDeleteTest();
+        
     }
 }
