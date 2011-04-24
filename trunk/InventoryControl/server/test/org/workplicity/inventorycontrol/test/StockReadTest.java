@@ -6,16 +6,10 @@ package org.workplicity.inventorycontrol.test;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Random;
 import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.inventorycontrol.entry.Stock;
-import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
-import org.workplicity.util.Logger;
-import org.workplicity.util.WorkDate;
-import org.workplicity.worklet.WorkletContext;
 
 /**
  *
@@ -26,11 +20,6 @@ public class StockReadTest extends Test {
 
     public StockReadTest() {
         super();
-    }
-    
-    public static void main(String[] args) {
-        
-        StockReadTest thisTest = new StockReadTest();
         
         try {
             String criteria1 = "/list";
@@ -108,5 +97,12 @@ public class StockReadTest extends Test {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    
+    public static void main(String[] args) {
+        
+        StockReadTest thisTest = new StockReadTest();
+        
+        
     }
 }

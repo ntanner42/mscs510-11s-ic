@@ -20,14 +20,8 @@ public class ItemCreateTest extends Test {
     
     public ItemCreateTest() {
         super();
-        
-    }
-
-    public static void main(String[] args) {
         try {
-            
-            ItemCreateTest thisTest = new ItemCreateTest();
-            
+ 
             String criteria1 = "/ list";
             //Issuing the query using the helper to the accounts repository
             ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
@@ -79,5 +73,10 @@ public class ItemCreateTest extends Test {
         catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public static void main(String[] args) {
+        ItemCreateTest thisTest = new ItemCreateTest();
+        
     }
 }

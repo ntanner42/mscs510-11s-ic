@@ -23,14 +23,8 @@ public class StockDeleteTest extends Test {
     public StockDeleteTest() {
         super();
         
-    }
-
-   
-    public static void main(String[] args) {
         try {
-            
-            ItemDeleteTest thisItem = new ItemDeleteTest();
-            
+
             String criteria1 = "/ list";
             //Issuing the query using the helper to the Inventories repository
             ArrayList<Stock> stocks = Helper.query("Inventories", criteria1, context);
@@ -51,5 +45,11 @@ public class StockDeleteTest extends Test {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+   
+    public static void main(String[] args) {
+        ItemDeleteTest thisItem = new ItemDeleteTest();
+        
     }
 }
