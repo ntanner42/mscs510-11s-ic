@@ -54,6 +54,5 @@ public class InventoryCreateTest extends Test {
     public static void main(String[] args) {
         InventoryCreateTest thisTest = new InventoryCreateTest();
         
-        
     }
 }
