@@ -22,12 +22,7 @@ public class LocationReadTest extends Test {
     public LocationReadTest() {
         super();
         
-    }
-    
-    public static void main(String[] args) {
         try {
-            LocationReadTest thisTest = new LocationReadTest();
-            
             String criteria1 = "/ list";
             //Issuing the query using the helper to the Locations repository
             ArrayList<Location> list = Helper.query("Locations", criteria1, context);
@@ -41,6 +36,16 @@ public class LocationReadTest extends Test {
                         + " Updated DATE:"
                         + new Date(location.getUpdateDate().getTime()));
             }
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+        
+    }
+    
+    public static void main(String[] args) {
+        try {
+            LocationReadTest thisTest = new LocationReadTest();
         } 
         catch (Exception e) {
             System.out.println(e);

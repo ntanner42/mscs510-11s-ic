@@ -36,6 +36,8 @@ public class ItemReadTest extends Test {
             }
             
             for (Inventory inventory : inventories) {
+                // add blank lines around inventory for better hierarchacal clarity.
+                System.out.println("");
                 
                 System.out.println("ID:" + inventory.getId() + " Name:"
                         + inventory.getName() + " Description:"
@@ -43,7 +45,9 @@ public class ItemReadTest extends Test {
                         + new Date(inventory.getCreateDate().getTime())
                         + " Updated DATE:"
                         + new Date(inventory.getUpdateDate().getTime()));
-            
+                
+                // add blank lines around inventory for better hierarchacal clarity.
+                System.out.println("");
                 
                 //Print all items in the inventory
                 String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
@@ -67,7 +71,7 @@ public class ItemReadTest extends Test {
 
                     }
                     catch(Exception e) {
-                        System.out.println();
+                        System.out.println("Incorrect type... skipping...");
                     }
                 }
                 

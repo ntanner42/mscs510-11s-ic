@@ -18,13 +18,9 @@ public class InventoryReadTest extends Test {
     
     public InventoryReadTest() {
         super();
-    }
-
-    public static void main(String[] args) {
+        
         try {
-            
-            InventoryReadTest thisTest = new InventoryReadTest();
-            
+
             String criteria1 = "/list";
             //Issuing the query using the helper to the Inventories repository
             ArrayList<Inventory> list = Helper.query("Inventories", criteria1, context);
@@ -32,19 +28,29 @@ public class InventoryReadTest extends Test {
                 throw new Exception("bad query");
             }
             //Print all inventories
-            for (Inventory inventory : list) {
+            for(int i=0; i< list.size(); i++) {
+                try {
+                    Inventory inventory = list.get(i);
 
-                System.out.println("ID:" + inventory.getId() + " Name:"
-                        + inventory.getName() + " Description:"
-                        + inventory.getDescription() + " Created DATE:"
-                        + new Date(inventory.getCreateDate().getTime())
-                        + " Updated DATE:"
-                        + new Date(inventory.getUpdateDate().getTime()));
-
+                    System.out.println("ID:" + inventory.getId() + " Name:"
+                            + inventory.getName() + " Description:"
+                            + inventory.getDescription() + " Created DATE:"
+                            + new Date(inventory.getCreateDate().getTime())
+                            + " Updated DATE:"
+                            + new Date(inventory.getUpdateDate().getTime()));
+                }
+                catch(Exception e) {
+                    System.out.println("Incorrect Type... Skipping...");
+                }
             }
 
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public static void main(String[] args) {
+        InventoryReadTest thisTest = new InventoryReadTest();
+        
     }
 }

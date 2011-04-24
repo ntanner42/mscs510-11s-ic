@@ -17,36 +17,12 @@ import org.workplicity.worklet.WorkletContext;
  * @author SHAN
  * @author Brian Gormanly
  */
-public class LocationCreateTest {
+public class LocationCreateTest extends Test {
 
-    /**
-     * This constant is the URL to reach the Netprevayle server.
-     */
-    private final static String URL_BASE =
-            "http://localhost:8080/netprevayle/task";
-    /**
-     * This is the worklet context to utilize the Helper pattern.
-     */
-    private static WorkletContext context = WorkletContext.getInstance();
-
-    /**
-     * NetTest entry point for the JVM
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
+    public LocationCreateTest() {
+        super();
+        
         try {
-            // Disable logging which goes to the console.
-            Logger.setEnabled(false);
-
-            // Set the host to use.
-            NetTask.setUrlBase(URL_BASE);
-
-            // Login using the admin account with the default
-            // log name and password
-            if (!Helper.login("admin", "gaze11e", context)) {
-                throw new Exception("login failed");
-            }
-            
             String[] names = {"Donnelly Hall", "Hancock Hall", "Fontaine Hall", "Lowell Thomas", "Dyson Center", "Cannavino Library", "McCann Center"};
             
             for(int i=0; i<names.length; i++) {
@@ -64,5 +40,10 @@ public class LocationCreateTest {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    
+    public static void main(String[] args) {
+        LocationCreateTest thisTest = new LocationCreateTest();
+        
     }
 }
