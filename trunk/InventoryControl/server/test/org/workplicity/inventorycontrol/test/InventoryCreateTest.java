@@ -21,13 +21,9 @@ public class InventoryCreateTest extends Test {
 
     public InventoryCreateTest() {
         super();
-    }
-    
-    public static void main(String[] args) {
+        
         try {
-            
-            InventoryCreateTest thisTest = new InventoryCreateTest();
-            
+
             //Create array of names
             String[] names = {"Main College Inventory", "Security Inventory"};
             
@@ -53,5 +49,11 @@ public class InventoryCreateTest extends Test {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    
+    public static void main(String[] args) {
+        InventoryCreateTest thisTest = new InventoryCreateTest();
+        
+        
     }
 }

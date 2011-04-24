@@ -17,22 +17,11 @@ import org.workplicity.worklet.WorkletContext;
  *
  * @author Brian Gormanly
  */
-public class LocationDeleteTest {
+public class LocationDeleteTest extends Test {
 
-    /**
-     * This constant is the URL to reach the Netprevayle server.
-     */
-    private final static String URL_BASE = "http://localhost:8080/netprevayle/task";
-    /**
-     * This is the worklet context to utilize the Helper pattern.
-     */
-    private static WorkletContext context = WorkletContext.getInstance();
-
-    /**
-     * NetTest entry point for the JVM
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
+    public LocationDeleteTest() {
+        super();
+        
         try {
             // Disable logging which goes to the console.
             Logger.setEnabled(false);
@@ -58,5 +47,10 @@ public class LocationDeleteTest {
         } catch (Exception e) {
             System.out.println(e);
         }
+        
+    }
+    public static void main(String[] args) {
+        LocationDeleteTest thisTest = new LocationDeleteTest();
+        
     }
 }

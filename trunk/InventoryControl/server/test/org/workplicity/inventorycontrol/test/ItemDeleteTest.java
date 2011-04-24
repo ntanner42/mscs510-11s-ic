@@ -32,12 +32,19 @@ public class ItemDeleteTest extends Test {
             
             String criteria1 = "/ list";
             //Issuing the query using the helper to the Inventories repository
-            ArrayList<Item> list = Helper.query("Inventories", criteria1, context);
+            ArrayList<Item> items = Helper.query("Inventories", criteria1, context);
             //deleting all inventories
-            for (Item item : list) {
-                if (!Helper.delete(item, "Inventories", context)) {
-                    System.out.print("Delete failed!");
+            for(int i=0; i<items.size(); i++) {
+                try{
+                        Item item = items.get(i);
+                    if (!Helper.delete(item, "Inventories", context)) {
+                        System.out.print("Delete failed!");
+                    }
                 }
+                catch(Exception e) {
+                    System.out.println("Incorrect type... skipping...");
+                }
+                    
             }
             System.out.print("Delete finished");
         } catch (Exception e) {

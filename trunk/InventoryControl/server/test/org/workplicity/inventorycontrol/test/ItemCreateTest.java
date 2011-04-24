@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -45,7 +45,7 @@ public class ItemCreateTest extends Test {
                 Integer[] sts = {5, 5, 2, 2, 1};
                 
                 for(int i=0; i<names.length; i++) {
-                    if(i>0) {
+                    if(inventory.getName() == "Security Inventory") {
                         // add security suffix for security items only
                         suffix = " Security";
                     }
