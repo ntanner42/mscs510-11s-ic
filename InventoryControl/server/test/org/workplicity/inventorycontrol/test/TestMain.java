@@ -17,6 +17,8 @@ public class TestMain extends Test {
         InventoryDeleteTest idt = new InventoryDeleteTest();
         ItemDeleteTest itdt = new ItemDeleteTest();
         StockDeleteTest sdt = new StockDeleteTest();
+        TrainingDeleteTest tdt = new TrainingDeleteTest();
+        OperAudDeleteTest odt = new OperAudDeleteTest();
         
         // create new data
         LocationCreateTest lct = new LocationCreateTest();
@@ -24,9 +26,17 @@ public class TestMain extends Test {
         ItemCreateTest itct = new ItemCreateTest();
         StockCreateTest sct = new StockCreateTest();
         
+        // create Training
+        TrainingCreateTest tct = new TrainingCreateTest();
+        
+        // create Operation Audit
+        OperAudCreateTest oct = new OperAudCreateTest();
+        
         // show some output
         LocationReadTest lrt = new LocationReadTest();
         StockReadTest srt = new StockReadTest();
+        TrainingReadTest trt = new TrainingReadTest();
+        OperAudReadTest ort = new OperAudReadTest();
         
     }
     

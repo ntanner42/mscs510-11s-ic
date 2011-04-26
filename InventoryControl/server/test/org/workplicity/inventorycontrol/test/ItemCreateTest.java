@@ -78,5 +78,8 @@ public class ItemCreateTest extends Test {
     public static void main(String[] args) {
         ItemCreateTest thisTest = new ItemCreateTest();
         
+        String criteria1 = "/list";
+        //Issuing the query using the helper to the Inventories repository
+        ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
     }
 }
