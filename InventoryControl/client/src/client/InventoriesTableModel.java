@@ -14,6 +14,7 @@ import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.util.Helper;
+import org.workplicity.util.WorkDate;
 import org.workplicity.worklet.WorkletContext;
 
 /**
@@ -32,6 +33,12 @@ public class InventoriesTableModel extends AbstractTableModel
         "Name",
         "Description"
     };
+
+    public void add(Inventory inventoryToAdd)
+    {
+        // Inserts a new inventory at the end of the arraylist.
+        inventories.add(0, inventoryToAdd);
+    }
 
     @Override
     public String getColumnName(int col)
@@ -79,39 +86,36 @@ public class InventoriesTableModel extends AbstractTableModel
                 indicator = "* ";
             }
 
-            //valueToReturn = id + indicator;
-            valueToReturn = "5";
+            valueToReturn = id + indicator;
         }
         else if(col == 1)
         {
-            //valueToReturn = inventory.getUpdateDate();
-            valueToReturn = "12/04/2010";
+            valueToReturn = inventory.getUpdateDate();
         }
         else if(col == 2)
         {
-            //valueToReturn = inventory.getName();
-            valueToReturn = "Vacuums";
+            valueToReturn = inventory.getName();
         }
         else if(col == 3)
         {
-            //valueToReturn = inventory.getDescription();
-            valueToReturn = "All the vacuums";
+            valueToReturn = inventory.getDescription();        
         }
 
         return valueToReturn;
     }
+
     @Override
     public void setValueAt(Object value, int row, int col)
     {
         Inventory inventory = getRow(row);
-        
+
         if(col == 2)
         {
             inventory.setName((String)value);
         }
         else if(col == 3)
         {
-            //inventory.setDescription((String)value);
+            inventory.setDescription((String)value);
         }
 
         dirty.put(inventory.getId(),inventory);
@@ -123,7 +127,7 @@ public class InventoriesTableModel extends AbstractTableModel
     {
         WorkletContext context = WorkletContext.getInstance();
 
-        inventories = Helper.query("Items", "/list", context);
+        inventories = Helper.query("Inventories", "/list", context);
 
         dirty.clear();
 

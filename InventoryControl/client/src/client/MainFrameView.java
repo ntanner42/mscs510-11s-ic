@@ -4,19 +4,28 @@
 
 package client;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
+import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.task.NetTask;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  * The application's main frame.
  */
 public class MainFrameView extends FrameView {
+    private static WorkletContext context = WorkletContext.getInstance();
 
     public MainFrameView(SingleFrameApplication app) {
         super(app);
@@ -33,8 +42,24 @@ public class MainFrameView extends FrameView {
 
         initComponents();
         initInventoriesTable();
+
+        login();
     }
 
+    private void init()
+    {
+        inventoriesTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    JTable target = (JTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    //int column = target.getSelectedColumn();
+                    editRequest(row);
+                }
+            }
+        });
+    }
     private void initInventoriesTable()
     {
         // Fix the column widths
@@ -53,6 +78,30 @@ public class MainFrameView extends FrameView {
             col.setPreferredWidth(WIDTHS[i]);
         }
     }
+
+    private void login()
+    {
+       try {
+            NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+
+            if(!Helper.login("admin","gaze11e",context))
+                throw new Exception("login failed");
+
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // Logger.log(e.toString());
+        }
+    }
+
+   private void editRequest(int row)
+   {
+        InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+
+        Inventory inventory = model.getRow(row);
+
+        System.out.println(inventory);
+    }
+
     @Action
     public void showAboutBox() {
         if (aboutBox == null) {
@@ -219,11 +268,22 @@ public class MainFrameView extends FrameView {
             public void run() {
                 try
                 {
-                    // Displays add item dialog
+                    // Displays add inventory dialog
                     AddInventoryDialog inventoryDialog =
                             new AddInventoryDialog( null , true);
 
                     inventoryDialog.setVisible(true);
+
+                    if(inventoryDialog.addedInventory())
+                    {
+                        Inventory inventoryToAdd = inventoryDialog.newInventory();
+                        InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+                        int newRow = model.getRowCount();
+                        model.setValueAt(inventoryToAdd.getId(), newRow, 0);
+                        model.setValueAt(inventoryToAdd.getCreateDate(), newRow, 1);
+                        model.setValueAt(inventoryToAdd.getName(), newRow, 2);
+                        model.setValueAt(inventoryToAdd.getDescription(), newRow, 3);
+                    }
                 } catch (Exception e) {
                     //Logger.log(e.toString());
                 }
@@ -232,7 +292,50 @@ public class MainFrameView extends FrameView {
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-        // TODO add your handling code here:
+        final JFrame frame = this.getFrame();
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+
+                final HashMap<Integer, Inventory> dirty = model.getDirty();
+
+                if (model.getDirty().isEmpty()) {
+                    model.refresh();
+                    return;
+                }
+
+                String msg = "Some work slates have changed.";
+                msg += "\nSave them?";
+
+                int n = JOptionPane.showConfirmDialog(
+                        frame,
+                        msg,
+                        "Confirm",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (n == 1) {
+                    model.refresh();
+                    return;
+                }
+
+                WorkletContext context = WorkletContext.getInstance();
+
+                for(Integer id : dirty.keySet()) {
+                    Inventory inventory = dirty.get(id);
+
+                    if(!Helper.insert(inventory, NetTask.REPOS_WORKSLATES,context)) {
+                        JOptionPane.showMessageDialog(frame, "Saved failed!",
+                                "Grounds", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    }
+                }
+
+                model.refresh();
+            }
+        });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed

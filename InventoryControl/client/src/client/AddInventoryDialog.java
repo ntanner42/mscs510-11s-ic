@@ -13,15 +13,20 @@ package client;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import javax.swing.JOptionPane;
+import org.workplicity.inventorycontrol.entry.Inventory;
 
 /**
  *
  * @author Neal
  */
-public class AddInventoryDialog extends javax.swing.JDialog {
+public class AddInventoryDialog extends javax.swing.JDialog
+{
+    private boolean addedInventory = false;
 
     /** Creates new form AddInventoryDialog */
-    public AddInventoryDialog(java.awt.Frame parent, boolean modal) {
+    public AddInventoryDialog(java.awt.Frame parent, boolean modal)
+    {
         super(parent, modal);
 
         // Attempt to set the appearance to the system default
@@ -55,6 +60,8 @@ public class AddInventoryDialog extends javax.swing.JDialog {
         int newX = (screenWidth / 2) - (windowWidth / 2);
         int newY = (screenHeight / 2) - (windowHeight / 2);
         this.setLocation(newX, newY);
+
+        this.setTitle("Add New Inventory");
     }
 
     /** This method is called from within the constructor to
@@ -70,8 +77,8 @@ public class AddInventoryDialog extends javax.swing.JDialog {
         cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        inventoryNameTextField = new javax.swing.JTextField();
+        inventoryDescriptionTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -99,11 +106,11 @@ public class AddInventoryDialog extends javax.swing.JDialog {
         jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
-        jTextField1.setText(resourceMap.getString("jTextField1.text")); // NOI18N
-        jTextField1.setName("jTextField1"); // NOI18N
+        inventoryNameTextField.setText(resourceMap.getString("inventoryNameTextField.text")); // NOI18N
+        inventoryNameTextField.setName("inventoryNameTextField"); // NOI18N
 
-        jTextField2.setText(resourceMap.getString("jTextField2.text")); // NOI18N
-        jTextField2.setName("jTextField2"); // NOI18N
+        inventoryDescriptionTextField.setText(resourceMap.getString("inventoryDescriptionTextField.text")); // NOI18N
+        inventoryDescriptionTextField.setName("inventoryDescriptionTextField"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -118,8 +125,8 @@ public class AddInventoryDialog extends javax.swing.JDialog {
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)))
+                            .addComponent(inventoryNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+                            .addComponent(inventoryDescriptionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(saveButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -132,11 +139,11 @@ public class AddInventoryDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(inventoryNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(inventoryDescriptionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveButton)
@@ -148,15 +155,52 @@ public class AddInventoryDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
-        dispose();
+        String nameEntered = inventoryNameTextField.getText();
+        String descriptionEntered = inventoryDescriptionTextField.getText();
+
+        if((nameEntered.equals("") && descriptionEntered.equals("")) ||
+                (nameEntered.equals("Enter the inventory name") &&
+                    descriptionEntered.equals("Enter the inventory description")))
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a name and a description",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if(nameEntered.equals("") || nameEntered.equals("Enter the inventory name"))
+        {
+            JOptionPane.showMessageDialog(this, "Please enter a name",
+                        "Name missing", JOptionPane.ERROR_MESSAGE);               
+        }
+        else if(descriptionEntered.equals("") || descriptionEntered.equals("Enter the inventory description"))
+        {
+            JOptionPane.showMessageDialog(this, "Please enter a description",
+                        "Description missing", JOptionPane.ERROR_MESSAGE);            
+        }
+        else
+        {
+            this.setVisible(false);
+            this.addedInventory = true;
+        }
 }//GEN-LAST:event_saveButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
-        dispose();
+        this.setVisible(false);
+        this.addedInventory = false;
 }//GEN-LAST:event_cancelButtonActionPerformed
 
+    public boolean addedInventory()
+    {
+        return this.addedInventory;
+    }
+
+    public Inventory newInventory()
+    {
+        Inventory inventoryToReturn = new Inventory("");
+        inventoryToReturn.setName(inventoryNameTextField.getText());
+        inventoryToReturn.setDescription(inventoryDescriptionTextField.getText());
+        return inventoryToReturn;
+    }
     /**
     * @param args the command line arguments
     */
@@ -165,6 +209,7 @@ public class AddInventoryDialog extends javax.swing.JDialog {
             public void run() {
                 AddInventoryDialog dialog = new AddInventoryDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -176,10 +221,10 @@ public class AddInventoryDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JTextField inventoryDescriptionTextField;
+    private javax.swing.JTextField inventoryNameTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
