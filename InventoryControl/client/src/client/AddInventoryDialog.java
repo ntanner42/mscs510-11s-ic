@@ -201,6 +201,7 @@ public class AddInventoryDialog extends javax.swing.JDialog
         inventoryToReturn.setDescription(inventoryDescriptionTextField.getText());
         return inventoryToReturn;
     }
+
     /**
     * @param args the command line arguments
     */
