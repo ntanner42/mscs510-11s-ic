@@ -41,12 +41,13 @@ public class MainFrameView extends FrameView {
         }
 
         initComponents();
+        initTableEditor();
         initInventoriesTable();
 
         login();
     }
 
-    private void init()
+    private void initTableEditor()
     {
         inventoriesTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -60,6 +61,7 @@ public class MainFrameView extends FrameView {
             }
         });
     }
+
     private void initInventoriesTable()
     {
         // Fix the column widths
@@ -72,7 +74,8 @@ public class MainFrameView extends FrameView {
             214,  // Description
         };
 
-        for(int i=0; i < WIDTHS.length; i++) {
+        for(int i=0; i < WIDTHS.length; i++)
+        {
             TableColumn col = inventoriesTable.getColumnModel().getColumn(i);
 
             col.setPreferredWidth(WIDTHS[i]);
@@ -128,6 +131,7 @@ public class MainFrameView extends FrameView {
         refreshButton = new javax.swing.JButton();
         deleteButton = new javax.swing.JButton();
         addButton = new javax.swing.JButton();
+        drillButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
@@ -182,6 +186,16 @@ public class MainFrameView extends FrameView {
             }
         });
 
+        drillButton.setIcon(resourceMap.getIcon("drillButton.icon")); // NOI18N
+        drillButton.setText(resourceMap.getString("drillButton.text")); // NOI18N
+        drillButton.setName("drillButton"); // NOI18N
+        drillButton.setPreferredSize(new java.awt.Dimension(49, 25));
+        drillButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drillButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -192,7 +206,9 @@ public class MainFrameView extends FrameView {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createSequentialGroup()
                         .addComponent(refreshButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                        .addComponent(drillButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteButton)
@@ -206,13 +222,14 @@ public class MainFrameView extends FrameView {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(byeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(refreshButton)
-                        .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(deleteButton))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(drillButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(byeButton, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                        .addComponent(refreshButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE))
+                    .addComponent(deleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -263,6 +280,8 @@ public class MainFrameView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        final JFrame frame = this.getFrame();
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -278,11 +297,18 @@ public class MainFrameView extends FrameView {
                     {
                         Inventory inventoryToAdd = inventoryDialog.newInventory();
                         InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
-                        int newRow = model.getRowCount();
-                        model.setValueAt(inventoryToAdd.getId(), newRow, 0);
-                        model.setValueAt(inventoryToAdd.getCreateDate(), newRow, 1);
-                        model.setValueAt(inventoryToAdd.getName(), newRow, 2);
-                        model.setValueAt(inventoryToAdd.getDescription(), newRow, 3);
+                        boolean addSuccessful = model.add(inventoryToAdd);
+
+                        if(!addSuccessful)
+                        {
+                            JOptionPane.showMessageDialog(frame, "Add failed!",
+                                "Inventory Control - Inventories",
+                                JOptionPane.ERROR_MESSAGE);
+                        }
+                        else
+                        {
+                            model.refresh();
+                        }
                     }
                 } catch (Exception e) {
                     //Logger.log(e.toString());
@@ -307,7 +333,7 @@ public class MainFrameView extends FrameView {
                     return;
                 }
 
-                String msg = "Some work slates have changed.";
+                String msg = "Some inventories have changed.";
                 msg += "\nSave them?";
 
                 int n = JOptionPane.showConfirmDialog(
@@ -321,25 +347,46 @@ public class MainFrameView extends FrameView {
                     return;
                 }
 
-                WorkletContext context = WorkletContext.getInstance();
+                boolean updateSuccessful = model.update();
 
-                for(Integer id : dirty.keySet()) {
-                    Inventory inventory = dirty.get(id);
-
-                    if(!Helper.insert(inventory, NetTask.REPOS_WORKSLATES,context)) {
-                        JOptionPane.showMessageDialog(frame, "Saved failed!",
-                                "Grounds", JOptionPane.ERROR_MESSAGE);
-                        break;
-                    }
+                if(!updateSuccessful)
+                {
+                    JOptionPane.showMessageDialog(frame, "Saved failed!",
+                        "Inventory Control - Inventories",
+                        JOptionPane.ERROR_MESSAGE);
                 }
-
-                model.refresh();
+                else
+                {
+                    model.refresh();
+                }
             }
         });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        // TODO add your handling code here:
+        final JFrame frame = this.getFrame();
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                int row = inventoriesTable.getSelectedRow();
+
+                InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+                boolean deleteSuccessful = model.delete(row);
+
+                if(!deleteSuccessful)
+                {
+                        JOptionPane.showMessageDialog(frame, "Saved failed!",
+                            "Inventory Control - Inventories",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                {
+                    model.refresh();
+                }
+            }
+        });
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void byeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_byeButtonActionPerformed
@@ -356,11 +403,33 @@ public class MainFrameView extends FrameView {
         dialog.setVisible(true);
     }//GEN-LAST:event_usersMenuItemActionPerformed
 
+    private void drillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillButtonActionPerformed
+        final JFrame frame = this.getFrame();
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                int row = inventoriesTable.getSelectedRow();
+
+                InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+
+                Inventory inventoryToExamine = model.getRow(row);
+
+                InventoryDialog inventoryDialog = new InventoryDialog(frame,
+                                                                      true,
+                                                                      inventoryToExamine);
+                inventoryDialog.setVisible(true);
+            }
+        });
+    }//GEN-LAST:event_drillButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JMenu adminMenu;
     private javax.swing.JButton byeButton;
     private javax.swing.JButton deleteButton;
+    private javax.swing.JButton drillButton;
     private javax.swing.JTable inventoriesTable;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuItem locationsMenuItem;

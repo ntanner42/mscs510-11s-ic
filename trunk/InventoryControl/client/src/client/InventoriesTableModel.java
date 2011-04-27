@@ -14,7 +14,6 @@ import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.util.Helper;
-import org.workplicity.util.WorkDate;
 import org.workplicity.worklet.WorkletContext;
 
 /**
@@ -34,10 +33,20 @@ public class InventoriesTableModel extends AbstractTableModel
         "Description"
     };
 
-    public void add(Inventory inventoryToAdd)
+    public boolean add(Inventory inventoryToAdd)
     {
-        // Inserts a new inventory at the end of the arraylist.
-        inventories.add(0, inventoryToAdd);
+        WorkletContext context = WorkletContext.getInstance();
+
+        return Helper.insert(inventoryToAdd, "Inventories",context);
+    }
+
+    public boolean delete(int row)
+    {
+        WorkletContext context = WorkletContext.getInstance();
+
+        Inventory inventoryToDelete = inventories.get(row);
+
+        return Helper.delete(inventoryToDelete, "Inventories", context);
     }
 
     @Override
@@ -90,7 +99,7 @@ public class InventoriesTableModel extends AbstractTableModel
         }
         else if(col == 1)
         {
-            valueToReturn = inventory.getUpdateDate();
+            valueToReturn = inventory.getUpdateDate().toString();
         }
         else if(col == 2)
         {
@@ -132,6 +141,26 @@ public class InventoriesTableModel extends AbstractTableModel
         dirty.clear();
 
         this.fireTableDataChanged();
+    }
+
+    public boolean update()
+    {
+        // Saves the changes to the table
+        boolean updateComplete = true;
+
+        WorkletContext context = WorkletContext.getInstance();
+
+        for(Integer id : dirty.keySet()) {
+            Inventory inventory = dirty.get(id);
+
+            if(!Helper.insert(inventory, "Inventories",context))
+            {
+                updateComplete = false;
+                break;
+            }
+        }
+
+        return updateComplete;
     }
 
     public Inventory getRow(int row)

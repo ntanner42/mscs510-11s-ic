@@ -8,6 +8,7 @@ package client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
+import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
@@ -20,6 +21,7 @@ public class ItemsTableModel extends AbstractTableModel
 {
     private ArrayList<Item> items = new ArrayList<Item>( );
     private HashMap<Integer,Item> dirty = new HashMap<Integer,Item>( );
+    private Inventory inventory = null;
 
     private static String[] columnNames =
     {
@@ -30,6 +32,39 @@ public class ItemsTableModel extends AbstractTableModel
         "Description"
     };
 
+    public boolean add(Item itemToAdd)
+    {
+        items.add(itemToAdd);
+
+        return this.update();
+    }
+
+    public boolean delete(int row)
+    {
+        items.remove(row);
+
+        return this.update();
+    }
+
+    public boolean update()
+    {
+        WorkletContext context = WorkletContext.getInstance();
+
+        inventory.setList(items);
+
+        return Helper.insert(inventory, "Inventories", context);
+    }
+
+    public Inventory getInventory()
+    {
+        return inventory;
+    }
+    
+    public void setInventory(Inventory inventory)
+    {
+        this.inventory = inventory;
+    }
+    
     @Override
     public String getColumnName(int col)
     {
@@ -129,11 +164,22 @@ public class ItemsTableModel extends AbstractTableModel
     {
         WorkletContext context = WorkletContext.getInstance();
 
-        items = Helper.query("Items", "/list", context);
+        int id = inventory.getId();
 
-        dirty.clear();
+        // Get the query
+        ArrayList<Inventory> list = Helper.query("Inventories", "/list [ id = '" + id + "' ]", context);
 
-        this.fireTableDataChanged();
+        //get the inventory
+        if (list.size() > 0)
+        {
+            inventory = list.get(0);
+
+            items = new ArrayList<Item>(inventory.getList());
+
+            dirty.clear();
+
+            this.fireTableDataChanged();
+        }//end if
     }
 
     public Item getRow(int row)

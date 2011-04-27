@@ -13,15 +13,19 @@ package client;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import org.workplicity.inventorycontrol.entry.Item;
 
 /**
  *
  * @author Neal
  */
-public class AddItemDialog extends javax.swing.JDialog {
+public class AddItemDialog extends javax.swing.JDialog
+{
+    private boolean addedItem = false;
 
     /** Creates new form AddItemDialog */
-    public AddItemDialog(java.awt.Frame parent, boolean modal) {
+    public AddItemDialog(java.awt.Frame parent, boolean modal)
+    {
         super(parent, modal);
 
         // Attempt to set the appearance to the system default
@@ -55,6 +59,23 @@ public class AddItemDialog extends javax.swing.JDialog {
         int newX = (screenWidth / 2) - (windowWidth / 2);
         int newY = (screenHeight / 2) - (windowHeight / 2);
         this.setLocation(newX, newY);
+    }
+
+    public boolean addedItem()
+    {
+        return this.addedItem;
+    }
+
+    public Item newItem()
+    {
+        Item itemToReturn = new Item("");
+
+        itemToReturn.setName(itemNameTextField.getText());
+        itemToReturn.setDescription(itemDescriptionTextField.getText());
+        itemToReturn.setModelNumber(itemModelTextField.getText());
+        itemToReturn.setOem(itemOEMTextField.getText());
+
+        return itemToReturn;
     }
 
     /** This method is called from within the constructor to
@@ -191,13 +212,13 @@ public class AddItemDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
-        dispose();
+        this.setVisible(false);
+        this.addedItem = true;
 }//GEN-LAST:event_saveButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
-        dispose();
+        this.setVisible(false);
+        this.addedItem = false;
 }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**

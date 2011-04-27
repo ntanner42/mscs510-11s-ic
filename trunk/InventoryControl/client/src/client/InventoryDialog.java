@@ -13,9 +13,15 @@ package client;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
+import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.inventorycontrol.entry.Item;
 
 /**
  *
@@ -26,13 +32,14 @@ public class InventoryDialog extends javax.swing.JDialog {
     // Pointer to the parent frame, for passing to subsequent
     // dialogs.
     private java.awt.Frame parentFrame = null;
+    private Inventory inventory = null;
 
     /** Creates new form InventoryDialog */
-    public InventoryDialog(java.awt.Frame parent, boolean modal)
+    public InventoryDialog(java.awt.Frame parent, boolean modal, Inventory inventory)
     {
         super(parent, modal);
         parentFrame = parent;
-        
+
         // Attempt to set the appearance to the system default
         try
         {
@@ -44,11 +51,12 @@ public class InventoryDialog extends javax.swing.JDialog {
         }
             
         initComponents();
-        init();
-        initItemsTable();
+        init(inventory);
+        initTableEditor();
+        initItemsTable(inventory);
     }
 
-    private void init()
+    private void init(Inventory inventory)
     {
         // Get the screen size object
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -65,9 +73,12 @@ public class InventoryDialog extends javax.swing.JDialog {
         int newX = (screenWidth / 2) - (windowWidth / 2);
         int newY = (screenHeight / 2) - (windowHeight / 2);
         this.setLocation(newX, newY);
+
+        inventoryNameTextField.setText(inventory.getName());
+        inventoryNameTextField.setEditable(false);
     }
 
-    private void initItemsTable()
+    private void initItemsTable(Inventory inventory)
     {
         // Fix the column widths
         itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -85,7 +96,26 @@ public class InventoryDialog extends javax.swing.JDialog {
 
             col.setPreferredWidth(WIDTHS[i]);
         }
+
+        ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+        model.setInventory(inventory);
     }
+
+    private void initTableEditor()
+    {
+        itemsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    JTable target = (JTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    //int column = target.getSelectedColumn();
+                    editRequest(row);
+                }
+            }
+        });
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -200,13 +230,60 @@ public class InventoryDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+   private void editRequest(int row)
+   {
+        ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+
+        Item item = model.getRow(row);
+
+        System.out.println(item);
+    }
+
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-        // Add refresh code here
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+
+                final HashMap<Integer, Item> dirty = model.getDirty();
+
+                if (model.getDirty().isEmpty()) {
+                    model.refresh();
+                    return;
+                }
+
+                String msg = "Some items have changed.";
+                msg += "\nSave them?";
+
+                int n = JOptionPane.showConfirmDialog(
+                        parentFrame,
+                        msg,
+                        "Confirm",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (n == 1) {
+                    model.refresh();
+                    return;
+                }
+
+                boolean updateSuccessful = model.update();
+
+                if(!updateSuccessful)
+                {
+                    JOptionPane.showMessageDialog(parentFrame, "Saved failed!",
+                        "Inventory Control - Inventories",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                {
+                    model.refresh();
+                }
+            }
+        });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        final InventoryDialog dialog = this;
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -214,9 +291,27 @@ public class InventoryDialog extends javax.swing.JDialog {
                 {
                     // Displays add item dialog
                     AddItemDialog itemDialog =
-                            new AddItemDialog( null , true);
+                            new AddItemDialog( parentFrame , true);
 
                     itemDialog.setVisible(true);
+
+                    if(itemDialog.addedItem())
+                    {
+                        Item itemToAdd = itemDialog.newItem();
+                        ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+                        boolean addSuccessful = model.add(itemToAdd);
+
+                        if(!addSuccessful)
+                        {
+                            JOptionPane.showMessageDialog(parentFrame, "Add failed!",
+                                "Inventory Control - Inventories",
+                                JOptionPane.ERROR_MESSAGE);
+                        }
+                        else
+                        {
+                            model.refresh();
+                        }
+                    }
                 } catch (Exception e) {
                     //Logger.log(e.toString());
                 }
@@ -229,7 +324,7 @@ public class InventoryDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-        this.dispose();
+        this.setVisible(false);
     }//GEN-LAST:event_doneButtonActionPerformed
 
     /**
@@ -238,8 +333,9 @@ public class InventoryDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                InventoryDialog dialog = new InventoryDialog(new javax.swing.JFrame(), true);
+                InventoryDialog dialog = new InventoryDialog(new javax.swing.JFrame(), true, new Inventory(""));
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
