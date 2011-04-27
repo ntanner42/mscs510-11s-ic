@@ -33,8 +33,8 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jTextField1" pref="238" max="32767" attributes="0"/>
-                          <Component id="jTextField2" alignment="0" pref="238" max="32767" attributes="0"/>
+                          <Component id="inventoryNameTextField" pref="238" max="32767" attributes="0"/>
+                          <Component id="inventoryDescriptionTextField" alignment="0" pref="238" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
@@ -53,12 +53,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="inventoryNameTextField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="inventoryDescriptionTextField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="60" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -101,16 +101,16 @@
         <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField1">
+    <Component class="javax.swing.JTextField" name="inventoryNameTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="jTextField1.text"/>
-        <Property name="name" type="java.lang.String" value="jTextField1" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="inventoryNameTextField.text"/>
+        <Property name="name" type="java.lang.String" value="inventoryNameTextField" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField2">
+    <Component class="javax.swing.JTextField" name="inventoryDescriptionTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="jTextField2.text"/>
-        <Property name="name" type="java.lang.String" value="jTextField2" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="inventoryDescriptionTextField.text"/>
+        <Property name="name" type="java.lang.String" value="inventoryDescriptionTextField" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>
