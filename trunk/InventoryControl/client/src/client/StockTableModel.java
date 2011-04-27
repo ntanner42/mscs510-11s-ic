@@ -5,7 +5,15 @@
 
 package client;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
+import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.inventorycontrol.entry.Item;
+import org.workplicity.inventorycontrol.entry.Stock;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
@@ -13,7 +21,11 @@ import javax.swing.table.AbstractTableModel;
  */
 public class StockTableModel extends AbstractTableModel {
 
-     /**
+
+
+    private ArrayList<Stock> requiredStocks = new ArrayList<Stock>( );
+    private HashMap<Integer,Stock> dirty = new HashMap<Integer,Stock>( );
+    /**
      * Names of the columns
      */
      private static String[] columnNames = {
@@ -30,7 +42,7 @@ public class StockTableModel extends AbstractTableModel {
 
 
     public int getRowCount() {
-        return 1;
+        return requiredStocks.size();
     }
 
     public int getColumnCount() {
@@ -50,18 +62,26 @@ public class StockTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
 
+        Stock stock = requiredStocks.get(rowIndex);
         switch(columnIndex) {
             case 0:
-                return 102 ;
-
+                    String indicator = "";
+                    Integer id = stock.getId();
+                    if(dirty.get(id) != null)
+                    indicator = "* ";
+                    return id + indicator;
+            
             case 1:
-                return "12/04/2010";
+                    Date date = stock.getUpdateDate();
+                    return date;
                 
             case 2:
-                return "ASDF65" ;
+                    String assetTag = stock.getAssetTag();
+                    return assetTag;
                 
             case 3:
-                return "RMA8242";
+                    String rmaNumber = stock.getRmaNumber();
+                    return rmaNumber;
 
         }
         
@@ -73,12 +93,13 @@ public class StockTableModel extends AbstractTableModel {
      * @param row Row
      * @return Stock
      */
-    //public Stock getRow(int row) {
-        //if(row < 0 || row >= .size())
-            //return null;
+    public Stock getRow(int row) {
+        
+        if(row < 0 || row >= requiredStocks.size())
+            return null;
 
-        //return .get(row);
-    //}
+        return requiredStocks.get(row);
+    }
 
     /**
      * Removes a stock from the table
@@ -87,13 +108,68 @@ public class StockTableModel extends AbstractTableModel {
         // .remove(row);
     }
 
+     @Override
+    public void setValueAt(Object value, int row, int col) {
+        Stock stock = getRow(row);
+
+        switch(col) {
+            case 2:
+                   stock.setAssetTag((String)value);
+                   break;
+            case 3:
+                   stock.setRmaNumber((String)value);
+                   break;
+        }
+
+        dirty.put(stock.getId(),stock);
+
+        this.fireTableDataChanged();
+
+//        WorkletContext context = WorkletContext.getInstance();
+//
+//        Helper.insert(workSlate, NetTask.REPOS_WORKSLATES,context);
+////        getRow(row).setName((String)value);
+    }
+
+
+
     /**
      * Refreshes the table of stock;
      */
-    public void refresh() {
+    public void refresh(Inventory inventory,Item item) {
 
+        WorkletContext context = WorkletContext.getInstance();
+
+        String s1 = inventory.getId().toString();
+        String s2 = item.getId().toString();
+
+        String criteria = "/list[inventoryId=" + inventory.getId().toString() +"]";
+
+
+        ArrayList<Item> items = Helper.query("Inventories", criteria, context);
+
+
+        for(int i=0; i<items.size(); i++) {
+               Item item1 = items.get(i);
+
+               if (item1.getId().toString().equals(item.getId().toString()))
+               {
+
+                    //query the stock for the item
+                    //Print all items in the inventory
+                    String criteria3 = "/list[itemId=" + item.getId().toString() + "]";
+                    requiredStocks = Helper.query("Inventories", criteria3, context);
+                }
+        }
+
+        dirty.clear();
         this.fireTableDataChanged();
     }
-   
+
+    
+
+    public HashMap<Integer,Stock> getDirty() {
+        return dirty;
+    }
 
 }

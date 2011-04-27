@@ -13,40 +13,66 @@ package client;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.JDialog;
+import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
+import org.workplicity.entry.Entry;
+import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.inventorycontrol.entry.Item;
+import org.workplicity.inventorycontrol.entry.Stock;
+import org.workplicity.task.NetTask;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 
 /**
  *
- * @author Neal
+ * @author Sandeep MJ
  */
 public class ItemDialog extends javax.swing.JDialog {
 
-    /** Creates new form ItemDialog */
-    public ItemDialog(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+
+     private static WorkletContext context = WorkletContext.getInstance();
+
+     private ArrayList<Item> currentItem = new ArrayList<Item>( );
+     private ArrayList<Inventory> currentInventory = new ArrayList<Inventory>( );
+    
+     /** Creates new form ItemDialog */
+     public ItemDialog(java.awt.Frame parent,Inventory inventory , Item item, boolean modal) {
+         super(parent, modal);
+         try {
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+         } catch (Exception e) {
+
+         }
+
         initComponents();
 
-        // sets the title of the dialog
-        this.setTitle("Item details");
-
-        init();
+        currentItem.add(item);
+        currentInventory.add(inventory);
+        init(inventory,item);
 
     }
 
     /**
      * Initializes the dialog.
      */
-     private void init(){
+     private void init(Inventory inventory, Item item){
 
          // positions the dialog to the centre of the screen
          this.setLocationRelativeTo(null);
 
-         initBasicItemInformation();
-         initStockTable();
+         // sets the title of the dialog
+         this.setTitle("Item details");
+
+
+         initBasicItemInformation(item);
+         initStockTable(inventory,item);
          initTrainingTable();
          initOrderingTable();
 
@@ -55,14 +81,20 @@ public class ItemDialog extends javax.swing.JDialog {
      /**
      * Initializes the Basic item information.
      */
-     private void initBasicItemInformation(){
-       
+     private void initBasicItemInformation( Item item){
+
+         this.itemNameTextField.setText(item.getName().toString());
+         this.itemDescriptionTextField.setText(item.getDescription().toString());
+         this.itemModelTextField.setText(item.getModelNumber().toString());
+         this.itemReOrderThresholdTextField.setText(item.getStockThreshold().toString());
+         this.itemOEMTextField.setText(item.getOem().toString());
+         
      }
 
     /**
      * Initializes the Stock table.
      */
-    private void initStockTable() {
+    private void initStockTable(Inventory inventory, Item item) {
         // Fix the column widths
         stockTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -89,19 +121,25 @@ public class ItemDialog extends javax.swing.JDialog {
                     JTable target = (JTable) e.getSource();
                     final int row = target.getSelectedRow();
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
                            // call method to perform task on double click
-                        }
-                    });
+                            editStockRequest(row);
+                       
                 }
             }
         });
 
-        //StockTableModel model = (StockTableModel) stockTable.getModel();
-        //model.refresh();
+        StockTableModel model = (StockTableModel) stockTable.getModel();
+        model.refresh(inventory,item);
     }
 
+        private Stock editStockRequest(int row) {
+        StockTableModel stockModel = (StockTableModel) stockTable.getModel();
+
+        Stock selectedStock = stockModel.getRow(row);
+
+        return selectedStock;
+        //System.out.println(selectedStock);
+    }
 
     /**
      * Initializes the Training table.
@@ -210,13 +248,14 @@ public class ItemDialog extends javax.swing.JDialog {
         itemModelTextField = new javax.swing.JTextField();
         itemDescriptionTextField = new javax.swing.JTextField();
         itemOEMTextField = new javax.swing.JTextField();
-        reorderThresholdTextField = new javax.swing.JTextField();
+        itemReOrderThresholdTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         stockPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         stockTable = new javax.swing.JTable();
         deleteStockButton = new javax.swing.JButton();
         addStockButton = new javax.swing.JButton();
+        editButton = new javax.swing.JButton();
         trainingPanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         trainingTable = new javax.swing.JTable();
@@ -268,8 +307,8 @@ public class ItemDialog extends javax.swing.JDialog {
         itemOEMTextField.setText(resourceMap.getString("itemOEMTextField.text")); // NOI18N
         itemOEMTextField.setName("itemOEMTextField"); // NOI18N
 
-        reorderThresholdTextField.setText(resourceMap.getString("reorderThresholdTextField.text")); // NOI18N
-        reorderThresholdTextField.setName("reorderThresholdTextField"); // NOI18N
+        itemReOrderThresholdTextField.setText(resourceMap.getString("itemReOrderThresholdTextField.text")); // NOI18N
+        itemReOrderThresholdTextField.setName("itemReOrderThresholdTextField"); // NOI18N
 
         jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
         jLabel6.setName("jLabel6"); // NOI18N
@@ -287,13 +326,12 @@ public class ItemDialog extends javax.swing.JDialog {
                     .addComponent(jLabel2)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(basicPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(basicPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(itemOEMTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(itemDescriptionTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(itemModelTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(itemNameTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE))
-                    .addComponent(reorderThresholdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(basicPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(itemReOrderThresholdTextField)
+                    .addComponent(itemOEMTextField)
+                    .addComponent(itemDescriptionTextField)
+                    .addComponent(itemModelTextField)
+                    .addComponent(itemNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE))
                 .addContainerGap(148, Short.MAX_VALUE))
         );
         basicPanelLayout.setVerticalGroup(
@@ -318,8 +356,8 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(basicPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(reorderThresholdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(59, Short.MAX_VALUE))
+                    .addComponent(itemReOrderThresholdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         itemTabbedPane.addTab(resourceMap.getString("basicPanel.TabConstraints.tabTitle"), basicPanel); // NOI18N
@@ -350,36 +388,46 @@ public class ItemDialog extends javax.swing.JDialog {
             }
         });
 
+        editButton.setIcon(resourceMap.getIcon("editButton.icon")); // NOI18N
+        editButton.setText(resourceMap.getString("editButton.text")); // NOI18N
+        editButton.setName("editButton"); // NOI18N
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout stockPanelLayout = new javax.swing.GroupLayout(stockPanel);
         stockPanel.setLayout(stockPanelLayout);
         stockPanelLayout.setHorizontalGroup(
             stockPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(stockPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, stockPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(stockPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, stockPanelLayout.createSequentialGroup()
+                .addGroup(stockPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
+                    .addGroup(stockPanelLayout.createSequentialGroup()
+                        .addComponent(editButton, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(addStockButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deleteStockButton)))
                 .addContainerGap())
         );
 
-        stockPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addStockButton, deleteStockButton});
+        stockPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addStockButton, deleteStockButton, editButton});
 
         stockPanelLayout.setVerticalGroup(
             stockPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(stockPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(stockPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(deleteStockButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addStockButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(7, 7, 7)
+                .addGroup(stockPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(editButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(deleteStockButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(addStockButton, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
+                .addContainerGap())
         );
-
-        stockPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addStockButton, deleteStockButton});
 
         itemTabbedPane.addTab(resourceMap.getString("stockPanel.TabConstraints.tabTitle"), stockPanel); // NOI18N
 
@@ -435,7 +483,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addGroup(trainingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deleteTrainingButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(addTrainingButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         trainingPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addTrainingButton, deleteTrainingButton});
@@ -494,7 +542,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addGroup(orderingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(deleteOrderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(addOrderButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         orderingPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addOrderButton, deleteOrderButton});
@@ -530,8 +578,7 @@ public class ItemDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(itemTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(refreshButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
@@ -539,17 +586,18 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(doneButton)
                 .addContainerGap())
+            .addComponent(itemTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(itemTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(itemTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(doneButton)
                     .addComponent(refreshButton)
                     .addComponent(saveButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -579,81 +627,227 @@ public class ItemDialog extends javax.swing.JDialog {
 
     private void deleteStockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteStockButtonActionPerformed
 
-        StockTableModel model = (StockTableModel) stockTable.getModel();
-       // TODO add delete stock handling code here:
-        String msg = "Are sure to delete this stock?";
-              
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+         final ItemDialog frame = this;
 
-        if (n == 1) {
-            return;
-            
-        }
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                StockTableModel model = (StockTableModel) stockTable.getModel();
+                int row = stockTable.getSelectedRow();
+                if (row == -1){
 
-         model.fireTableDataChanged();
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a stock from the table to delete ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+
+                }
+                else
+                 {
+                    Stock stock = editStockRequest(row);
+                    
+                   // TODO add delete stock handling code here:
+                    String msg = "Are sure to delete this stock?";
+
+                    int n = JOptionPane.showConfirmDialog(
+                            null,
+                            msg,
+                            "Confirm",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (n == 1) {
+                        return;
+
+                    }
+
+                    try{
+                        if (!Helper.delete(stock, "Inventories", context)) {
+                            System.out.print("Delete failed!");
+                        }
+                        else
+                        {
+                            System.out.print("Delete successful");
+                        }
+                     }catch(Exception ex){
+
+                     }
+                     }
+
+                     refreshStock();
+                     model.fireTableDataChanged();
+                    
+                }
+
+          });
+        
     }//GEN-LAST:event_deleteStockButtonActionPerformed
 
+
+    private void refreshStock(){
+
+            final ItemDialog frame = this;
+
+
+            Item item = currentItem.get(0);
+            Inventory inventory = currentInventory.get(0);
+            StockTableModel model = (StockTableModel) stockTable.getModel();
+
+            final HashMap<Integer, Stock> dirty = model.getDirty();
+
+            if (model.getDirty().isEmpty()) {
+                model.refresh(inventory, item);
+                return;
+            }
+
+            String msg = "Some stocks have changed.";
+            msg += "\nSave them?";
+
+            int n = JOptionPane.showConfirmDialog(
+                    frame,
+                    msg,
+                    "Confirm",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (n == 1) {
+                model.refresh(inventory, item);
+                return;
+            }
+
+            saveStock(inventory,item);
+                
+
+
+    }// end refresh stock
+
+    private void saveStock(Inventory inventory,Item item){
+
+        final ItemDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+        StockTableModel model = (StockTableModel) stockTable.getModel();
+        final HashMap<Integer, Stock> dirty = model.getDirty();
+
+        String criteria = "/list[inventoryId=" + inventory.getId().toString() +"]";
+        ArrayList<Item> items = Helper.query("Inventories", criteria, context);
+
+
+        for(int i=0; i<items.size(); i++) {
+               Item nextItem = items.get(i);
+
+               if (nextItem.getId().toString().equals(item.getId().toString()))
+               {
+
+                    //query the stock for the item
+                    //Print all items in the inventory
+                    String criteria3 = "/list[itemId=" + item.getId().toString() + "]";
+
+                    for(Integer id : dirty.keySet()) {
+                    Stock stock = dirty.get(id);
+
+                             item.insert(stock);
+
+                             System.out.println(stock.getId());
+
+                             if (!Helper.insert(stock, "Inventories", context)) {
+                                 JOptionPane.showMessageDialog(frame, "insert Item into Inventory failed!",
+                                    "Stocks", JOptionPane.ERROR_MESSAGE);
+
+                             }
+
+                                System.out.println(stock.getId());
+
+                    }// end foreach
+                }// end if
+
+              }// end for
+
+        model.refresh(inventory, item);
+
+    }// end saveStock
+
+
+  
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         // TODO add refresh button handling code here:
-        String msg = "Some items have changed.";
-               msg += "\nSave them?";
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+       SwingUtilities.invokeLater(new Runnable() {
 
-        if (n == 1) {
-            return;
-            
-        }
+           public void run() {
+
+                refreshStock();
+
+
+             }// end run
+
+        });// end swing utilities
+
 
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add save handling code here:
+        final ItemDialog frame = this;
+        SwingUtilities.invokeLater(new Runnable() {
+
+           public void run() {
+
+                 Item item = currentItem.get(0);
+                 Inventory inventory = currentInventory.get(0);
+
+                saveStock(inventory,item);
+
+
+             }// end run
+
+        });// end swing utilities
+
+
          dispose();
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
         // TODO add done handling code here:
-        String msg = "Some items have changed.";
-               msg += "\nSave them?";
+        // TODO add refresh button handling code here:
+       SwingUtilities.invokeLater(new Runnable() {
 
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+           public void run() {
 
-        if (n == 1) {
-            //return;
-            dispose();
-        }
+                refreshStock();
+
+
+             }// end run
+
+        });// end swing utilities
 
         dispose();
     }//GEN-LAST:event_doneButtonActionPerformed
 
     private void addStockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStockButtonActionPerformed
         
-        final ItemDialog dialog = this;
+        
+        final ItemDialog frame = this;
+         final  Item item = currentItem.get(0);
+          final  Inventory inventory = currentInventory.get(0);
+          final  Stock stock = new Stock();
+
+
+            refreshStock();
+       
         SwingUtilities.invokeLater(new Runnable() {
-            @Override
+
+                    
             public void run() {
-                try {
-                    // Displays add stock dialog
-                    AddStockDialog stockDialog =
-                            new AddStockDialog( null , true);
+                                   // Displays add stock dialog
 
-                    stockDialog.setVisible(true);
 
-                } catch (Exception e) {
-                    //Logger.log(e.toString());
-                }
+                        AddStockDialog stockDialog =
+                                new AddStockDialog( null , inventory, item, stock, true);
+                        stockDialog.setVisible(true);
+                        stockDialog.setTitle("Add new stock");
+                        
+                        refreshStock();
+
+             
             }
         });
 
@@ -717,27 +911,98 @@ public class ItemDialog extends javax.swing.JDialog {
         });
     }//GEN-LAST:event_addOrderButtonActionPerformed
 
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        // TODO add your handling code here:
+
+        final ItemDialog frame = this;
+        final  Item item = currentItem.get(0);
+        final  Inventory inventory = currentInventory.get(0);
+       
+       //refreshStock();
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+
+            public void run() {
+
+                int row = stockTable.getSelectedRow();
+                if (row == -1){
+
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a stock from the table to view ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+
+                }
+                else
+                 {
+                                   // Displays add stock dialog
+                        Stock stock = new Stock();
+                        stock = editStockRequest(row);
+                        AddStockDialog stockDialog =
+                                new AddStockDialog( null , inventory, item, stock, true);
+                        stockDialog.setVisible(true);
+                        stockDialog.setTitle("Edit stock");
+
+                        refreshStock();
+
+                }
+
+
+            }
+        });
+
+
+        
+    }//GEN-LAST:event_editButtonActionPerformed
+
     /**
     * @param args the command line arguments
     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                // Attempt to set the appearance to the system default
+
                 try {
-                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
+
+                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+
+                        if(!Helper.login("admin","gaze11e",context))
+                            throw new Exception("login failed");
+
+                    String criteria1 = "/list[1]";
+                    //Issuing the query using the helper to the Inventories repository
+                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
+                    if (inventories == null) {
+                        throw new Exception("bad query");
+                    }
+
+
+                    Inventory inventory = inventories.get(0);
+
+                     String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
+
+                  
+
+                    Item item = items.get(0);
+
+                   
+                    
+                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
+
+
+                    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
+                        @Override
+                        public void windowClosing(java.awt.event.WindowEvent e) {
+                            System.exit(0);
+                        }
+                    });
+                    dialog.setVisible(true);
+                 } catch (Exception ex) {
 
                 }
-                ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
             }
         });
     }
@@ -751,10 +1016,12 @@ public class ItemDialog extends javax.swing.JDialog {
     private javax.swing.JButton deleteStockButton;
     private javax.swing.JButton deleteTrainingButton;
     private javax.swing.JButton doneButton;
+    private javax.swing.JButton editButton;
     private javax.swing.JTextField itemDescriptionTextField;
     private javax.swing.JTextField itemModelTextField;
     private javax.swing.JTextField itemNameTextField;
     private javax.swing.JTextField itemOEMTextField;
+    private javax.swing.JTextField itemReOrderThresholdTextField;
     private javax.swing.JTabbedPane itemTabbedPane;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -767,7 +1034,6 @@ public class ItemDialog extends javax.swing.JDialog {
     private javax.swing.JPanel orderingPanel;
     private javax.swing.JTable ordersTable;
     private javax.swing.JButton refreshButton;
-    private javax.swing.JTextField reorderThresholdTextField;
     private javax.swing.JButton saveButton;
     private javax.swing.JPanel stockPanel;
     private javax.swing.JTable stockTable;

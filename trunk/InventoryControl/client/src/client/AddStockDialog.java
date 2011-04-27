@@ -11,7 +11,14 @@
 
 package client;
 
+import java.util.ArrayList;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.inventorycontrol.entry.Item;
+import org.workplicity.inventorycontrol.entry.Stock;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
@@ -19,13 +26,47 @@ import javax.swing.JOptionPane;
  */
 public class AddStockDialog extends javax.swing.JDialog {
 
-    /** Creates new form AddStockDialog */
-    public AddStockDialog(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
-        initComponents();
 
+    private ArrayList<Item> currentItem = new ArrayList<Item>( );
+    private ArrayList<Inventory> currentInventory = new ArrayList<Inventory>( );
+    private ArrayList<Stock> currentStock = new ArrayList<Stock>( );
+
+    /** Creates new form AddStockDialog */
+    public AddStockDialog(JDialog parent,Inventory inventory, Item item, Stock stock, boolean modal) {
+        super(parent, modal);
+       
+        initComponents();
+         try {
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+
+            }
         this.setLocationRelativeTo(null);
-        this.setTitle("Add stock");
+
+        currentItem.add(item);
+        currentInventory.add(inventory);
+        currentStock.add(stock);
+
+        init( inventory,item, stock);
+        
+    }
+
+    private void init(Inventory inventory, Item item, Stock stock){
+
+        if (!( stock.getPartNumber() == null)){
+              partNumberTextField.setText(stock.getPartNumber().toString());
+        }
+        if (!( stock.getAssetTag() == null)){
+            assetTagTextField.setText(stock.getAssetTag().toString());
+        }
+        if (! (stock.getRmaNumber() == null)){
+            rmaNumberTextField.setText(stock.getRmaNumber().toString());
+        }
+        if (! (stock.getSerialNumber() == null)){
+            serialNumberTextField.setText(stock.getRmaNumber().toString());
+
+        }
+
     }
 
     /** This method is called from within the constructor to
@@ -175,8 +216,100 @@ public class AddStockDialog extends javax.swing.JDialog {
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add save handling code here:
 
-        dispose();
+        String partNumber = partNumberTextField.getText().toString();
+        String rmaNumber = rmaNumberTextField.getText().toString();
+        String serialNumber = serialNumberTextField.getText().toString();
+        String assetTag = assetTagTextField.getText().toString();
+
+
+        Stock newStock = currentStock.get(0);
+        Item item = currentItem.get(0);
+        Inventory inventory = currentInventory.get(0);
+
+        if((partNumber.equals("")  || partNumber.equals("Enter the partNumber")))
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a partNumber ",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if ((rmaNumber.equals("")) || rmaNumber.equals("Enter the rma Number")){
+
+            JOptionPane.showMessageDialog(this,
+                        "Please enter the rmaNumber",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        if((serialNumber.equals("")  || serialNumber.equals("Enter the partNumber")))
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a serialNumber ",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if ((assetTag.equals("")) || assetTag.equals("Enter the rma Number")){
+
+            JOptionPane.showMessageDialog(this,
+                        "Please enter the assetTag",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            newStock.setPartNumber(partNumber);
+            newStock.setAssetTag(assetTag);
+            newStock.setSerialNumber(serialNumber);
+            newStock.setRmaNumber(rmaNumber);
+            newStock.setItemId(item.getId());
+            
+            insertStock(item,inventory,newStock);
+
+            dispose();
+        }
     }//GEN-LAST:event_saveButtonActionPerformed
+
+ private void insertStock(Item item,Inventory inventory,Stock newStock){
+
+
+        final AddStockDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+        //StockTableModel model = (StockTableModel) stockTable.getModel();
+
+
+        String criteria = "/list[inventoryId=" + inventory.getId().toString() +"]";
+        ArrayList<Item> items = Helper.query("Inventories", criteria, context);
+
+
+        for(int i=0; i<items.size(); i++) {
+               Item nextItem = items.get(i);
+
+               if (nextItem.getId().toString().equals(item.getId().toString()))
+               {
+
+                    //query the stock for the item
+                    //Print all items in the inventory
+                    String criteria3 = "/list[itemId=" + item.getId().toString() + "]";
+
+                    item.insert(newStock);
+
+                             System.out.println(newStock.getId());
+
+                             if (!Helper.insert(newStock, "Inventories", context)) {
+                                 JOptionPane.showMessageDialog(frame, "insert Item into Inventory failed!",
+                                    "Stocks", JOptionPane.ERROR_MESSAGE);
+
+                             }
+
+                                System.out.println(newStock.getId());
+
+                    }// end foreach
+                }// end if
+
+    }// end insert
+
+
+
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add cancel handling code here:
@@ -191,12 +324,9 @@ public class AddStockDialog extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 // Attempt to set the appearance to the system default
-                try {
-                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
 
-                }
-                AddStockDialog dialog = new AddStockDialog(new javax.swing.JFrame(), true);
+
+                AddStockDialog dialog = new AddStockDialog(new javax.swing.JDialog(),null, null , null, true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -220,5 +350,7 @@ public class AddStockDialog extends javax.swing.JDialog {
     private javax.swing.JButton saveButton;
     private javax.swing.JTextField serialNumberTextField;
     // End of variables declaration//GEN-END:variables
+
+   
 
 }
