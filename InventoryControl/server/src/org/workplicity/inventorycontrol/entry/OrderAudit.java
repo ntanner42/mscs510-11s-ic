@@ -13,7 +13,7 @@ import org.workplicity.entry.Entry;
  */
 public class OrderAudit extends Entry {
 
-    private static long serialVersionUID = -6482381378329769196L;
+    private static final long serialVersionUID = -6482381378329769196L;
     private Date stamp;
     private Integer ordersize;
     private String poNumber;
@@ -33,7 +33,7 @@ public class OrderAudit extends Entry {
      * @param stamp the stamp to set
      */
     public void setStamp(Date stamp) {
-        this.stamp = stamp;
+        this.stamp.setTime(stamp.getTime());
     }
 
     /**

@@ -13,7 +13,7 @@ import org.workplicity.entry.Entry;
  */
 public class Training extends Entry {
 
-    private static long serialVersionUID = -6482381378329769196L;
+    private static final long serialVersionUID = -6482381378329769196L;
 
     public enum Status {
 
@@ -81,7 +81,7 @@ public class Training extends Entry {
      * @param date the date to set
      */
     public void setDate(Date date) {
-        this.date = date;
+        this.date.setTime(date.getTime());
     }
 
     /**
