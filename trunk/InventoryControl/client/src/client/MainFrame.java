@@ -1,7 +1,7 @@
 /*
  * MainFrame.java
  */
-
+;
 package client;
 
 import org.jdesktop.application.Application;

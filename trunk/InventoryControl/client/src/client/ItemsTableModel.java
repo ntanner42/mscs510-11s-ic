@@ -100,39 +100,47 @@ public class ItemsTableModel extends AbstractTableModel
 
         Object valueToReturn = null;
 
-        if(col == 0)
-        {
-            String indicator = "";
-
-            Integer id = item.getId();
-
-            if(dirty.get(id) != null)
+        try {
+        
+            if(col == 0)
             {
-                indicator = "* ";
-            }
+                String indicator = "";
 
-            //valueToReturn = id + indicator;
-            valueToReturn = "5";
+                Integer id = item.getId();
+
+                if(dirty.get(id) != null)
+                {
+                    indicator = "* ";
+                }
+
+                valueToReturn = id + indicator;
+                //valueToReturn = "5";
+            }
+            else if(col == 1)
+            {
+                valueToReturn = item.getUpdateDate();
+                //valueToReturn = "12/04/2010";
+            }
+            else if(col == 2)
+            {
+                valueToReturn = item.getModelNumber();
+                //valueToReturn = "ASF500";
+            }
+            else if(col == 3)
+            {
+                valueToReturn = item.getName();
+                //valueToReturn = "Hoover";
+            }
+            else if(col == 4)
+            {
+                valueToReturn = item.getDescription();
+                //valueToReturn = "It's a Hoover, Jim";
+            }
+        
         }
-        else if(col == 1)
-        {
-            //valueToReturn = item.getUpdateDate();
-            valueToReturn = "12/04/2010";
-        }
-        else if(col == 2)
-        {
-            //valueToReturn = item.getModelNumber();
-            valueToReturn = "ASF500";
-        }
-        else if(col == 3)
-        {
-            //valueToReturn = item.getName();
-            valueToReturn = "Hoover";
-        }
-        else if(col == 4)
-        {
-            //valueToReturn = item.getDescription();
-            valueToReturn = "It's a Hoover, Jim";
+        catch (Exception e) {
+            System.out.println("Incorrect Type..");
+            return null;
         }
 
         return valueToReturn;
@@ -173,8 +181,11 @@ public class ItemsTableModel extends AbstractTableModel
         if (list.size() > 0)
         {
             inventory = list.get(0);
+            
+            String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+            items = Helper.query("Inventories", criteria2, context);
 
-            items = new ArrayList<Item>(inventory.getList());
+            //items = new ArrayList<Item>(inventory.getList());
 
             dirty.clear();
 
