@@ -80,35 +80,45 @@ public class InventoriesTableModel extends AbstractTableModel
 
     public Object getValueAt(int row, int col)
     {
-        Inventory inventory = inventories.get(row);
-
         Object valueToReturn = null;
 
-        if(col == 0)
-        {
-            String indicator = "";
-
-            Integer id = inventory.getId();
-
-            if(dirty.get(id) != null)
+        
+        try{
+            Inventory inventory = inventories.get(row);
+            
+            if(col == 0)
             {
-                indicator = "* ";
-            }
+                String indicator = "";
 
-            valueToReturn = id + indicator;
+                Integer id = inventory.getId();
+
+                if(dirty.get(id) != null)
+                {
+                    indicator = "* ";
+                }
+
+                valueToReturn = id + indicator;
+            }
+            else if(col == 1)
+            {
+                valueToReturn = inventory.getUpdateDate().toString();
+            }
+            else if(col == 2)
+            {
+                valueToReturn = inventory.getName();
+            }
+            else if(col == 3)
+            {
+                valueToReturn = inventory.getDescription();        
+            }
         }
-        else if(col == 1)
-        {
-            valueToReturn = inventory.getUpdateDate().toString();
+        catch (Exception e) {
+            System.out.println("Incorrect Type..");
+            return null;
         }
-        else if(col == 2)
-        {
-            valueToReturn = inventory.getName();
-        }
-        else if(col == 3)
-        {
-            valueToReturn = inventory.getDescription();        
-        }
+        
+
+        
 
         return valueToReturn;
     }

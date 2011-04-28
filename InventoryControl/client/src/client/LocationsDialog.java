@@ -70,9 +70,9 @@ public class LocationsDialog extends javax.swing.JDialog {
             }
         });
 
-        //LocationsTableModel model = (LocationsTableModel) locationsTable.getModel();
+        LocationsTableModel model = (LocationsTableModel) locationsTable.getModel();
 
-        //model.refresh();
+        model.refresh();
     }
 
 

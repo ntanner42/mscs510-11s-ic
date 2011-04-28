@@ -5,13 +5,21 @@
 
 package client;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
+import org.workplicity.inventorycontrol.entry.Location;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
  * @author SandeepMJ
  */
 public class LocationsTableModel extends AbstractTableModel {
+    
+    private ArrayList<Location> locations = new ArrayList<Location>( );
+    private HashMap<Integer,Location> dirty = new HashMap<Integer,Location>( );
 
     /**
      * Names of the columns
@@ -29,8 +37,9 @@ public class LocationsTableModel extends AbstractTableModel {
     }
 
 
-    public int getRowCount() {
-        return 1;
+    public int getRowCount()
+    {
+        return locations.size();
     }
 
     public int getColumnCount() {
@@ -50,24 +59,81 @@ public class LocationsTableModel extends AbstractTableModel {
     }
 
 
-    public Object getValueAt(int rowIndex, int columnIndex) {
+    public Object getValueAt(int row, int col) {
+        
+        Object valueToReturn = null;
+        
+        try{
+            Location location = locations.get(row);
+            
+            if(col == 0)
+            {
+                String indicator = "";
 
-        switch(columnIndex) {
-            case 0:
-                return 102 ;
+                Integer id = location.getId();
 
-            case 1:
-                return "Marist College";
-
-            case 2:
-                return "3399 North Road" ;
-
-            case 3:
-                return "NY";
-
+                if(dirty.get(id) != null)
+                {
+                    indicator = "* ";
         }
 
-        return null;
+                valueToReturn = id + indicator;
+            }
+            else if(col == 0)
+            {
+                valueToReturn = location.getId().toString();
+            }
+            else if(col == 1)
+            {
+                valueToReturn = location.getName();
+            }
+            else if(col == 2)
+            {
+                valueToReturn = "3399 North Road";
+            }
+            else 
+            {
+                valueToReturn = "NY";
+            }
+        }
+        catch (Exception e) {
+            System.out.println("Incorrect Type..");
+            return null;
+        }
+        
+        return valueToReturn;
+
+    }
+    
+    @Override
+    public void setValueAt(Object value, int row, int col)
+    {
+        Location location = getRow(row);
+
+        if(col == 1)
+        {
+            location.setName((String)value);
+        }
+
+        dirty.put(location.getId(),location);
+
+        this.fireTableDataChanged();
+    }
+    
+    public boolean add(Location locationToAdd)
+    {
+        WorkletContext context = WorkletContext.getInstance();
+
+        return Helper.insert(locationToAdd, "Location",context);
+    }
+
+    public boolean delete(int row)
+    {
+        WorkletContext context = WorkletContext.getInstance();
+
+        Location locationToDelete = locations.get(row);
+
+        return Helper.delete(locationToDelete, "Locactions", context);
     }
 
    /**
@@ -91,10 +157,32 @@ public class LocationsTableModel extends AbstractTableModel {
 
     /**
      * Refreshes the table of location;
-     */
+     
     public void refresh() {
 
         this.fireTableDataChanged();
+    }
+     * */
+    
+    public void refresh()
+    {
+        WorkletContext context = WorkletContext.getInstance();
+
+        locations = Helper.query("Locations", "/list", context);
+
+        dirty.clear();
+
+        this.fireTableDataChanged();
+    }
+    
+    public Location getRow(int row)
+    {
+        return locations.get(row);
+    }
+
+    public HashMap<Integer,Location> getDirty()
+    {
+        return dirty;
     }
 
 
