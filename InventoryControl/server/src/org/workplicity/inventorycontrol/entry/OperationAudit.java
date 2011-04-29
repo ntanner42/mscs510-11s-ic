@@ -13,7 +13,7 @@ import org.workplicity.entry.Entry;
  */
 public class OperationAudit extends Entry {
 
-    private static final long serialVersionUID = -6482381378329769196L;
+    private static long serialVersionUID = -6482381378329769196L;
     private Item.Status status;
     private Date stamp;
     private Integer location;
