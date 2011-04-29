@@ -7,6 +7,7 @@
  * AddInventoryDialog.java
  *
  * Created on Apr 7, 2011, 11:07:02 PM
+ * 
  */
 
 package client;
@@ -19,6 +20,7 @@ import org.workplicity.inventorycontrol.entry.Inventory;
 /**
  *
  * @author Neal
+ * @author Brian Gormanly
  */
 public class AddInventoryDialog extends javax.swing.JDialog
 {
@@ -179,6 +181,12 @@ public class AddInventoryDialog extends javax.swing.JDialog
         }
         else
         {
+            
+            
+            // Do add to datastore
+            Inventory inventory = newInventory();
+            inventory.insert(inventory);
+            
             this.setVisible(false);
             this.addedInventory = true;
         }

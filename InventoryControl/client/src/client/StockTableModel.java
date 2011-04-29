@@ -63,26 +63,32 @@ public class StockTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
 
         Stock stock = requiredStocks.get(rowIndex);
-        switch(columnIndex) {
-            case 0:
-                    String indicator = "";
-                    Integer id = stock.getId();
-                    if(dirty.get(id) != null)
-                    indicator = "* ";
-                    return id + indicator;
-            
-            case 1:
-                    Date date = stock.getUpdateDate();
-                    return date;
-                
-            case 2:
-                    String assetTag = stock.getAssetTag();
-                    return assetTag;
-                
-            case 3:
-                    String rmaNumber = stock.getRmaNumber();
-                    return rmaNumber;
+        
+        try {
+            switch(columnIndex) {
+                case 0:
+                        String indicator = "";
+                        Integer id = stock.getId();
+                        if(dirty.get(id) != null)
+                        indicator = "* ";
+                        return id + indicator;
 
+                case 1:
+                        Date date = stock.getUpdateDate();
+                        return date;
+
+                case 2:
+                        String assetTag = stock.getAssetTag();
+                        return assetTag;
+
+                case 3:
+                        String rmaNumber = stock.getRmaNumber();
+                        return rmaNumber;
+
+            }
+        }
+        catch(Exception e) {
+            System.out.println("Item did not render..");
         }
         
         return null;
@@ -137,33 +143,40 @@ public class StockTableModel extends AbstractTableModel {
      * Refreshes the table of stock;
      */
     public void refresh(Inventory inventory,Item item) {
+        
+        try {
 
-        WorkletContext context = WorkletContext.getInstance();
+            WorkletContext context = WorkletContext.getInstance();
 
-        String s1 = inventory.getId().toString();
-        String s2 = item.getId().toString();
+            String s1 = inventory.getId().toString();
+            String s2 = item.getId().toString();
 
-        String criteria = "/list[inventoryId=" + inventory.getId().toString() +"]";
-
-
-        ArrayList<Item> items = Helper.query("Inventories", criteria, context);
+            String criteria = "/list[inventoryId=" + inventory.getId().toString() +"]";
 
 
-        for(int i=0; i<items.size(); i++) {
-               Item item1 = items.get(i);
+            ArrayList<Item> items = Helper.query("Inventories", criteria, context);
 
-               if (item1.getId().toString().equals(item.getId().toString()))
-               {
 
-                    //query the stock for the item
-                    //Print all items in the inventory
-                    String criteria3 = "/list[itemId=" + item.getId().toString() + "]";
-                    requiredStocks = Helper.query("Inventories", criteria3, context);
-                }
+            for(int i=0; i<items.size(); i++) {
+                   Item item1 = items.get(i);
+
+                   if (item1.getId().toString().equals(item.getId().toString()))
+                   {
+
+                        //query the stock for the item
+                        //Print all items in the inventory
+                        String criteria3 = "/list[itemId=" + item.getId().toString() + "]";
+                        requiredStocks = Helper.query("Inventories", criteria3, context);
+                    }
+            }
+
+            dirty.clear();
+            this.fireTableDataChanged();
+        
         }
-
-        dirty.clear();
-        this.fireTableDataChanged();
+        catch (Exception e) {
+            System.out.println("Stock refresh failed..");
+        }
     }
 
     
