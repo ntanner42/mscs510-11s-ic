@@ -826,31 +826,24 @@ public class ItemDialog extends javax.swing.JDialog {
         
         
         final ItemDialog frame = this;
-         final  Item item = currentItem.get(0);
-          final  Inventory inventory = currentInventory.get(0);
-          final  Stock stock = new Stock();
+        final  Item item = currentItem.get(0);
+        final  Inventory inventory = currentInventory.get(0);
+        final  Stock stock = new Stock();
 
 
-            refreshStock();
+        refreshStock();
        
-        SwingUtilities.invokeLater(new Runnable() {
-
-                    
+        SwingUtilities.invokeLater(new Runnable() {            
             public void run() {
-                                   // Displays add stock dialog
+                // Displays add stock dialog
+                AddStockDialog stockDialog =
+                        new AddStockDialog( null , inventory, item, stock, true);
+                stockDialog.setVisible(true);
+                stockDialog.setTitle("Add new stock");
 
-
-                        AddStockDialog stockDialog =
-                                new AddStockDialog( null , inventory, item, stock, true);
-                        stockDialog.setVisible(true);
-                        stockDialog.setTitle("Add new stock");
-                        
-                        refreshStock();
-
-             
+                refreshStock();
             }
         });
-
     }//GEN-LAST:event_addStockButtonActionPerformed
 
     private void addTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrainingButtonActionPerformed
@@ -936,7 +929,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 }
                 else
                  {
-                                   // Displays add stock dialog
+                        // Displays add stock dialog
                         Stock stock = new Stock();
                         stock = editStockRequest(row);
                         AddStockDialog stockDialog =
@@ -945,10 +938,7 @@ public class ItemDialog extends javax.swing.JDialog {
                         stockDialog.setTitle("Edit stock");
 
                         refreshStock();
-
                 }
-
-
             }
         });
 
@@ -965,39 +955,31 @@ public class ItemDialog extends javax.swing.JDialog {
 
                 try {
 
-                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
-
-                        if(!Helper.login("admin","gaze11e",context))
-                            throw new Exception("login failed");
-
-                    String criteria1 = "/list[1]";
-                    //Issuing the query using the helper to the Inventories repository
-                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
-                    if (inventories == null) {
-                        throw new Exception("bad query");
-                    }
-
-
-                    Inventory inventory = inventories.get(0);
-
-                     String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
-                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
-
-                  
-
-                    Item item = items.get(0);
-
-                   
-                    
-                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
-
-
+//                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+//
+//                        if(!Helper.login("admin","gaze11e",context))
+//                            throw new Exception("login failed");
+//
+//                    String criteria1 = "/list[1]";
+//                    //Issuing the query using the helper to the Inventories repository
+//                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
+//                    if (inventories == null) {
+//                        throw new Exception("bad query");
+//                    }
+//
+//                    Inventory inventory = inventories.get(0);
+//
+//                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+//                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
+//
+//                    Item item = items.get(0);
+           
+                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
                     dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-
-                        @Override
-                        public void windowClosing(java.awt.event.WindowEvent e) {
-                            System.exit(0);
-                        }
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
                     });
                     dialog.setVisible(true);
                  } catch (Exception ex) {
