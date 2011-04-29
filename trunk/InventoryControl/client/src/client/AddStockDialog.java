@@ -47,9 +47,10 @@ public class AddStockDialog extends javax.swing.JDialog {
         currentInventory.add(inventory);
         currentStock.add(stock);
 
+        // custom initialization for add stock.
         init( inventory,item, stock);
         
-    }
+    }// end AddStockDialod constructor
 
     private void init(Inventory inventory, Item item, Stock stock){
 
@@ -226,28 +227,28 @@ public class AddStockDialog extends javax.swing.JDialog {
         Item item = currentItem.get(0);
         Inventory inventory = currentInventory.get(0);
 
-        if((partNumber.equals("")  || partNumber.equals("Enter the partNumber")))
+        if((partNumber.equals("")  || partNumber.equals("Enter the partNumber")) || partNumber.isEmpty())
         {
             JOptionPane.showMessageDialog(this,
                         "Please enter a partNumber ",
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        else if ((rmaNumber.equals("")) || rmaNumber.equals("Enter the rma Number")){
+        else if ((rmaNumber.equals("")) || rmaNumber.equals("Enter the rma Number") || rmaNumber.isEmpty()){
 
             JOptionPane.showMessageDialog(this,
                         "Please enter the rmaNumber",
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        if((serialNumber.equals("")  || serialNumber.equals("Enter the partNumber")))
+        else if(serialNumber.equals("") || serialNumber.equals("Enter the partNumber") || serialNumber.isEmpty())
         {
             JOptionPane.showMessageDialog(this,
                         "Please enter a serialNumber ",
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        else if ((assetTag.equals("")) || assetTag.equals("Enter the rma Number")){
+        else if (assetTag.equals("") || assetTag.equals("Enter the rma Number") || assetTag.isEmpty()) {
 
             JOptionPane.showMessageDialog(this,
                         "Please enter the assetTag",
@@ -276,7 +277,6 @@ public class AddStockDialog extends javax.swing.JDialog {
 
         //StockTableModel model = (StockTableModel) stockTable.getModel();
 
-
         String criteria = "/list[inventoryId=" + inventory.getId().toString() +"]";
         ArrayList<Item> items = Helper.query("Inventories", criteria, context);
 
@@ -286,7 +286,6 @@ public class AddStockDialog extends javax.swing.JDialog {
 
                if (nextItem.getId().toString().equals(item.getId().toString()))
                {
-
                     //query the stock for the item
                     //Print all items in the inventory
                     String criteria3 = "/list[itemId=" + item.getId().toString() + "]";
@@ -299,12 +298,12 @@ public class AddStockDialog extends javax.swing.JDialog {
                                  JOptionPane.showMessageDialog(frame, "insert Item into Inventory failed!",
                                     "Stocks", JOptionPane.ERROR_MESSAGE);
 
-                             }
+                             }// end if
 
                                 System.out.println(newStock.getId());
 
-                    }// end foreach
-                }// end if
+                    }// end if
+                }// end for
 
     }// end insert
 
