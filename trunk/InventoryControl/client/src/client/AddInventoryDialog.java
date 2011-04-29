@@ -16,6 +16,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane;
 import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
@@ -157,6 +159,9 @@ public class AddInventoryDialog extends javax.swing.JDialog
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        
+        WorkletContext context = WorkletContext.getInstance();
+        
         String nameEntered = inventoryNameTextField.getText();
         String descriptionEntered = inventoryDescriptionTextField.getText();
 
@@ -185,7 +190,10 @@ public class AddInventoryDialog extends javax.swing.JDialog
             
             // Do add to datastore
             Inventory inventory = newInventory();
-            inventory.insert(inventory);
+            
+            if (!Helper.insert(inventory, "Inventories", context)) {
+                System.out.println("insert Item into Inventory failed!");
+            }
             
             this.setVisible(false);
             this.addedInventory = true;
