@@ -1,5 +1,7 @@
 /*
  * MainFrame.java
+ * @author Brian Gormanly
+ * 
  */
 ;
 package client;
@@ -11,7 +13,7 @@ import org.jdesktop.application.SingleFrameApplication;
  * The main class of the application.
  */
 public class MainFrame extends SingleFrameApplication {
-
+    
     /**
      * At startup create and show the main frame of the application.
      */

@@ -1,9 +1,12 @@
 /*
  * MainFrameView.java
+ * @author Brian Gormanly
+ * 
  */
 
 package client;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -45,6 +48,9 @@ public class MainFrameView extends FrameView {
         initInventoriesTable();
 
         login();
+        
+        refresh();
+
     }
 
     private void initTableEditor()
@@ -113,6 +119,54 @@ public class MainFrameView extends FrameView {
             aboutBox.setLocationRelativeTo(mainFrame);
         }
         MainFrame.getApplication().show(aboutBox);
+    }
+    
+    private void refresh() {
+        
+        final JFrame frame = this.getFrame();
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+
+                final HashMap<Integer, Inventory> dirty = model.getDirty();
+
+                if (model.getDirty().isEmpty()) {
+                    model.refresh();
+                    return;
+                }
+
+                String msg = "Some inventories have changed.";
+                msg += "\nSave them?";
+
+                int n = JOptionPane.showConfirmDialog(
+                        frame,
+                        msg,
+                        "Confirm",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (n == 1) {
+                    model.refresh();
+                    return;
+                }
+
+                boolean updateSuccessful = model.update();
+
+                if(!updateSuccessful)
+                {
+                    JOptionPane.showMessageDialog(frame, "Saved failed!",
+                        "Inventory Control - Inventories",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                {
+                    model.refresh();
+                }
+            }
+        });
+        
     }
 
     /** This method is called from within the constructor to
@@ -317,49 +371,7 @@ public class MainFrameView extends FrameView {
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-        final JFrame frame = this.getFrame();
-
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
-
-                final HashMap<Integer, Inventory> dirty = model.getDirty();
-
-                if (model.getDirty().isEmpty()) {
-                    model.refresh();
-                    return;
-                }
-
-                String msg = "Some inventories have changed.";
-                msg += "\nSave them?";
-
-                int n = JOptionPane.showConfirmDialog(
-                        frame,
-                        msg,
-                        "Confirm",
-                        JOptionPane.YES_NO_OPTION);
-
-                if (n == 1) {
-                    model.refresh();
-                    return;
-                }
-
-                boolean updateSuccessful = model.update();
-
-                if(!updateSuccessful)
-                {
-                    JOptionPane.showMessageDialog(frame, "Saved failed!",
-                        "Inventory Control - Inventories",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-                else
-                {
-                    model.refresh();
-                }
-            }
-        });
+        refresh();
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
