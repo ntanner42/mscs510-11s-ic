@@ -13,7 +13,7 @@ import org.workplicity.repos.Repository;
  */
 public class Item extends Repository<Stock> {
 
-    private static final long serialVersionUID = -6482381378329769196L;
+    private static long serialVersionUID = -6482381378329769196L;
 
     public enum Status {
 
