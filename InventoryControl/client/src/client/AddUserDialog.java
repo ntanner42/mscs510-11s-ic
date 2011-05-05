@@ -11,28 +11,34 @@
 
 package client;
 
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import org.workplicity.entry.User;
+import org.workplicity.entry.WorkSlate;
+import org.workplicity.task.NetTask;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
+
 /**
  *
- * @author vageesh & Krishnan
+ * @author Krishnan & Vageesh
  */
 public class AddUserDialog extends javax.swing.JDialog {
+    private boolean addedUser = false;
+    private ArrayList<User> Users = new ArrayList<User>( );
 
     /** Creates new form AddUserDialog */
     public AddUserDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        init();
-    }
-    //--Code for setting look&feeland centering to AddUsers dialog
-    private void init(){
-          this.setTitle("Add User");
-        this.setLocationRelativeTo(null);
-        try{
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        }
-        catch (Exception e){
 
-        }
+        this.setLocationRelativeTo(null);
+         this.setTitle("Add User");
+    }
+
+    public boolean addedUser()
+    {
+        return this.addedUser;
     }
 
     /** This method is called from within the constructor to
@@ -47,117 +53,223 @@ public class AddUserDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        cancelbutton = new javax.swing.JButton();
-        savebutton = new javax.swing.JButton();
+        lnameTextField = new javax.swing.JTextField();
+        saveButton = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        fnameTextField = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        cancelButton = new javax.swing.JButton();
+        phoneTextField = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        emailTextField = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(AddUserDialog.class);
-        jLabel1.setText(resourceMap.getString("User.text")); // NOI18N
         jLabel1.setName("User"); // NOI18N
 
-        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
-        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
 
-        jTextField1.setText(resourceMap.getString("jTextField1.text")); // NOI18N
-        jTextField1.setName("jTextField1"); // NOI18N
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(AddUserDialog.class);
+        lnameTextField.setText(resourceMap.getString("lnameTextField.text")); // NOI18N
+        lnameTextField.setName("lnameTextField"); // NOI18N
+        lnameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                lnameTextFieldActionPerformed(evt);
             }
         });
 
-        jTextField2.setText(resourceMap.getString("jTextField2.text")); // NOI18N
-        jTextField2.setName("jTextField2"); // NOI18N
-
-        jTextField3.setText(resourceMap.getString("jTextField3.text")); // NOI18N
-        jTextField3.setName("jTextField3"); // NOI18N
-
-        cancelbutton.setText(resourceMap.getString("cancelbutton.text")); // NOI18N
-        cancelbutton.setName("cancelbutton"); // NOI18N
-        cancelbutton.addActionListener(new java.awt.event.ActionListener() {
+        saveButton.setText(resourceMap.getString("saveButton.text")); // NOI18N
+        saveButton.setName("saveButton"); // NOI18N
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelbuttonActionPerformed(evt);
+                saveButtonActionPerformed(evt);
             }
         });
 
-        savebutton.setText(resourceMap.getString("savebutton.text")); // NOI18N
-        savebutton.setName("savebutton"); // NOI18N
-        savebutton.addActionListener(new java.awt.event.ActionListener() {
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+
+        fnameTextField.setText(resourceMap.getString("fnameTextField.text")); // NOI18N
+        fnameTextField.setName("fnameTextField"); // NOI18N
+        fnameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                savebuttonActionPerformed(evt);
+                fnameTextFieldActionPerformed(evt);
             }
         });
+
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
+        cancelButton.setText(resourceMap.getString("cancelButton.text")); // NOI18N
+        cancelButton.setName("cancelButton"); // NOI18N
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
+        phoneTextField.setText(resourceMap.getString("PhoneTextField.text")); // NOI18N
+        phoneTextField.setName("PhoneTextField"); // NOI18N
+
+        jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
+        jLabel6.setName("jLabel6"); // NOI18N
+
+        emailTextField.setText(resourceMap.getString("emailTextField.text")); // NOI18N
+        emailTextField.setName("emailTextField"); // NOI18N
+
+        jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
+        jLabel7.setName("jLabel7"); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
-                .addContainerGap(180, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(250, Short.MAX_VALUE)
-                .addComponent(savebutton)
-                .addGap(18, 18, 18)
-                .addComponent(cancelbutton)
+                .addContainerGap(213, Short.MAX_VALUE)
+                .addComponent(saveButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cancelButton)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addGap(30, 30, 30))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel7))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(emailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fnameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(lnameTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(phoneTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)))
+                .addContainerGap(147, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel3))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(fnameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel5)))
+                .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(jLabel4)
+                    .addComponent(lnameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cancelbutton)
-                    .addComponent(savebutton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cancelButton)
+                            .addComponent(saveButton)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(phoneTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(emailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7))))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    //
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+
+    private void lnameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lnameTextFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+}//GEN-LAST:event_lnameTextFieldActionPerformed
 
-    private void savebuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savebuttonActionPerformed
-        // --Save button handling code
-        dispose();
-    }//GEN-LAST:event_savebuttonActionPerformed
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        // TODO add your handling code here:
 
-    private void cancelbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelbuttonActionPerformed
-        // --Cancel button handling code
-        dispose();
-    }//GEN-LAST:event_cancelbuttonActionPerformed
+        String firstname = fnameTextField.getText().toString();
+        String lastname = lnameTextField.getText().toString();
+        String phoneNumber = phoneTextField.getText().toString();
+        String email = emailTextField.getText().toString();
 
+
+
+             User newuser = Users.get(0);
+
+
+        if((firstname.equals("")  || firstname.equals("Enter the FirstName")) || firstname.isEmpty())
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a FirstName ",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if ((lastname.equals("")) || lastname.equals("Enter the LastName") || lastname.isEmpty()){
+
+            JOptionPane.showMessageDialog(this,
+                        "Please enter the LastName",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if( phoneNumber.equals("") ||  phoneNumber.equals("Enter the phoneNumber") || phoneNumber.isEmpty())
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a  phoneNumber ",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if (email.equals("") || email.equals("Enter the email") || email.isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,
+                        "Please enter the email",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            newuser.setFirstName(firstname);
+            newuser.setLastName(lastname);
+            newuser.setPhone(phoneNumber);
+            newuser.setEmail(email);
+
+
+           insertUser(newuser);
+
+            dispose();
+        }
+
+
+        
+}//GEN-LAST:event_saveButtonActionPerformed
+
+
+
+    private void fnameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fnameTextFieldActionPerformed
+        // TODO add your handling code here:
+}//GEN-LAST:event_fnameTextFieldActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        // TODO add your handling code here:
+         this.setVisible(false);
+        this.addedUser = false;
+}//GEN-LAST:event_cancelButtonActionPerformed
+    //
     /**
     * @param args the command line arguments
     */
@@ -176,14 +288,55 @@ public class AddUserDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cancelbutton;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JTextField emailTextField;
+    private javax.swing.JTextField fnameTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JButton savebutton;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JTextField lnameTextField;
+    private javax.swing.JTextField phoneTextField;
+    private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
-}
+   public WorkSlate newUser() {
+         WorkSlate UserToReturn = new WorkSlate("");
+        UserToReturn.setName(fnameTextField.getText());
+        UserToReturn.setDescription(lnameTextField.getText());
+        UserToReturn.setDescription(phoneTextField.getText());
+        return UserToReturn;
+    }
+
+    private void insertUser(User newuser) {
+        final AddUserDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+        //StockTableModel model = (StockTableModel) stockTable.getModel();
+
+        String criteria = "/list";
+       // ArrayList<User> users = Helper.query("Users", criteria, context);
+
+
+       // for(int i=0; i<users.size(); i++) {
+               User nextUser = Users.get(0);
+
+              
+
+                             if (!Helper.insert(newuser, "Users", context)) {
+                                 JOptionPane.showMessageDialog(frame, "insert Users failed!",
+                                    "Users", JOptionPane.ERROR_MESSAGE);
+
+                             }// end if
+
+                                System.out.println(newuser.getId());
+
+                    }// end if
+                }// end for
+
+    
+
+
