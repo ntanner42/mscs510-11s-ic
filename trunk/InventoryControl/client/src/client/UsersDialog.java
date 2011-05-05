@@ -10,17 +10,35 @@
  */
 
 package client;
+
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
+
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
-import org.workplicity.entry.WorkSlate;
+import org.workplicity.entry.User;
+
+import org.workplicity.task.NetTask;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
- * @author vageesh & Krishnan
+ * @author Krishnan & Vageesh
  */
 public class UsersDialog extends javax.swing.JDialog {
+
+    private ArrayList<User> Users = new ArrayList<User>( );
+    private static WorkletContext context = WorkletContext.getInstance();
+
+
 
     /** Creates new form UsersDialog */
     public UsersDialog(java.awt.Frame parent, boolean modal) {
@@ -63,7 +81,25 @@ public class UsersDialog extends javax.swing.JDialog {
             col.setPreferredWidth(WIDTHS[i]);
 
         }
+        usersTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    JTable target = (JTable) e.getSource();
+                    final int row = target.getSelectedRow();
 
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                           // call method to perform task on double click
+                        }
+                    });
+                }
+            }
+        });
+        
+        UsersTableModel model = (UsersTableModel) usersTable.getModel();
+
+        model.refresh();
 
     }
 
@@ -95,15 +131,37 @@ public class UsersDialog extends javax.swing.JDialog {
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(UsersDialog.class);
         refreshButton.setIcon(resourceMap.getIcon("refreshButton.icon")); // NOI18N
         refreshButton.setName("refreshButton"); // NOI18N
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshButtonActionPerformed(evt);
+            }
+        });
 
         doneButton.setText(resourceMap.getString("doneButton.text")); // NOI18N
         doneButton.setName("doneButton"); // NOI18N
+        doneButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                doneButtonActionPerformed(evt);
+            }
+        });
 
         deleteButton.setIcon(resourceMap.getIcon("deleteButton.icon")); // NOI18N
         deleteButton.setName("deleteButton"); // NOI18N
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getActionMap(UsersDialog.class, this);
+        addButton.setAction(actionMap.get("click")); // NOI18N
         addButton.setIcon(resourceMap.getIcon("addButton.icon")); // NOI18N
         addButton.setName("addButton"); // NOI18N
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -112,10 +170,10 @@ public class UsersDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(refreshButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 231, Short.MAX_VALUE)
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteButton)
@@ -128,50 +186,219 @@ public class UsersDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(refreshButton)
-                    .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(deleteButton)
-                    .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(deleteButton)
+                        .addComponent(addButton, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(refreshButton))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // --Add button handling code
-        try{
-            AddUserDialog userDialog=new AddUserDialog(null,true);
-            userDialog.setVisible(true);
-        }
-        catch (Exception e){
+    private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
+        // TODO add your handling code here:
+         SwingUtilities.invokeLater(new Runnable() {
 
-        }
+           public void run() {
 
-    }
+                refreshUser();
 
-    private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // --Done button handling code
+
+             }// end run
+
+        });// end swing utilities
+
         dispose();
-    }
+    }//GEN-LAST:event_doneButtonActionPerformed
 
-    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // --Refresh button handling code
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        // TODO add your handling code here:
+          //final  User stock = Users.get(0);
+
+
+        refreshUser();
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                UsersTableModel model = (UsersTableModel) usersTable.getModel();
-                model.refresh();
+                // Displays add stock dialog
+                AddUserDialog userDialog =
+                        new AddUserDialog( null , true);
+                userDialog.setVisible(true);
+                userDialog.setTitle("Add new User");
 
+                refreshUser();
+            }
+        });
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        // TODO add your handling code here:
+
+         final UsersDialog frame = this;
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                UsersTableModel model = (UsersTableModel) usersTable.getModel();
+                int row = usersTable.getSelectedRow();
+                if (row == -1){
+
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a user from the table to delete ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+
+                }
+                else
+                 {
+                    User stock = editUserRequest(row);
+
+                   // TODO add delete stock handling code here:
+                    String msg = "Are sure to delete this user?";
+
+                    int n = JOptionPane.showConfirmDialog(
+                            null,
+                            msg,
+                            "Confirm",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (n == 1) {
+                        return;
+
+                    }
+
+                    try{
+                        if (!Helper.delete(stock, "Inventories", context)) {
+                            System.out.print("Delete failed!");
+                        }
+                        else
+                        {
+                            System.out.print("Delete successful");
+                        }
+                     }catch(Exception ex){
+
+                     }
+                     }
+
+                     refreshUser();
+                     model.fireTableDataChanged();
+
+                }
+
+            private User editUserRequest(int row) {
+
+        UsersTableModel stockModel = (UsersTableModel) usersTable.getModel();
+
+        User selectedStock = stockModel.getRow(row);
+
+        return selectedStock;
+        //System.out.println(selectedStock);
+    }
+
+
+          });
+        
+       
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+        // TODO add your handling code here:
+
+         SwingUtilities.invokeLater(new Runnable() {
+
+           public void run() {
+
+                refreshUser();
+
+
+             }// end run
+
+        });// end swing utilities
+    }//GEN-LAST:event_refreshButtonActionPerformed
+
+   
+
+  
+  
+
+      private void refreshUser(){
+
+            final UsersDialog frame = this;
+
+          //  User user = current.get(0);
+
+            UsersTableModel model = (UsersTableModel) usersTable.getModel();
+
+            final HashMap<Integer, User> dirty = model.getDirty();
+
+            if (model.getDirty().isEmpty()) {
+                model.refresh();
+                return;
             }
 
-    });
-    }
+            String msg = "Some Users have changed.";
+            msg += "\nSave them?";
 
-    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // --Delete button handling to be implemented
-    }
+            int n = JOptionPane.showConfirmDialog(
+                    frame,
+                    msg,
+                    "Confirm",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (n == 1) {
+                model.refresh();
+                return;
+            }
+
+          saveUser();
+
+
+
+    }// end refresh stock
+
+
+       private void saveUser() {
+        final UsersDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+        UsersTableModel model = (UsersTableModel) usersTable.getModel();
+        final HashMap<Integer, User> dirty = model.getDirty();
+
+        String criteria = "/list";
+        ArrayList<User> users = Helper.query("Users", criteria, context);
+
+
+
+                   for(Integer id : dirty.keySet()) {
+                    User user = dirty.get(id);
+
+                      //       item.insert(stock);
+
+                        //     System.out.println(user.getId());
+
+                             if (!Helper.insert(user, "Users", context)) {
+                                 JOptionPane.showMessageDialog(frame, "insert Users failed!",
+                                    "Users", JOptionPane.ERROR_MESSAGE);
+
+                             }
+
+                                System.out.println(user.getId());
+
+                    }// end foreach
+                          model.refresh();
+              }// end for
+
+
+
+
+
+
+
 
     /**
     * @param args the command line arguments
@@ -179,6 +406,30 @@ public class UsersDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+       
+                try {
+
+                   WorkletContext context = WorkletContext.getInstance();
+                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+
+                        if(!Helper.login("admin","gaze11e",context))
+                            throw new Exception("login failed");
+
+                    String criteria = "/list";
+                    //Issuing the query using the helper to the Inventories repository
+                   ArrayList<User> users = Helper.query("Accounts", criteria, context);
+                    if (users == null) {
+                        throw new Exception("bad query");
+                    }
+
+                    User user = users.get(0);
+
+                    
+
+                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception e) {
+
+                }
                 UsersDialog dialog = new UsersDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -199,4 +450,9 @@ public class UsersDialog extends javax.swing.JDialog {
     private javax.swing.JTable usersTable;
     // End of variables declaration//GEN-END:variables
 
+    private JFrame getFrame() {
+         throw new RuntimeException("Compiled Code");
+    }
 }
+
+   
