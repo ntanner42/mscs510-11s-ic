@@ -16,6 +16,7 @@ import org.workplicity.worklet.WorkletContext;
 /**
  *
  * @author Neal
+ * @author Brian Gormanly
  */
 public class ItemsTableModel extends AbstractTableModel
 {
@@ -34,25 +35,34 @@ public class ItemsTableModel extends AbstractTableModel
 
     public boolean add(Item itemToAdd)
     {
-        items.add(itemToAdd);
+        return items.add(itemToAdd);
 
-        return this.update();
+        //return this.update();
     }
 
     public boolean delete(int row)
     {
-        items.remove(row);
-
-        return this.update();
-    }
-
-    public boolean update()
-    {
+        
+        
         WorkletContext context = WorkletContext.getInstance();
 
-        inventory.setList(items);
+        Item itemToDelete = items.get(row);
+        items.remove(row);
 
-        return Helper.insert(inventory, "Inventories", context);
+        return Helper.delete(itemToDelete, "Inventories", context);
+
+    }
+
+    public boolean update(int row, Inventory inventory)
+    {
+        WorkletContext context = WorkletContext.getInstance();
+        
+        Item item = items.get(row);
+        
+        inventory.insert(item);
+
+        return Helper.insert(item, "Inventories", context);
+
     }
 
     public Inventory getInventory()

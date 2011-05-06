@@ -33,7 +33,7 @@ public class InventoryDialog extends javax.swing.JDialog {
     // Pointer to the parent frame, for passing to subsequent
     // dialogs.
     private java.awt.Frame parentFrame = null;
-    private Inventory inventory = null;
+    private Inventory inventory = new Inventory("");
 
     /** Creates new form InventoryDialog */
     public InventoryDialog(java.awt.Frame parent, boolean modal, Inventory inventory)
@@ -50,6 +50,8 @@ public class InventoryDialog extends javax.swing.JDialog {
         {
             System.out.println("Failed to set the look and feel.");
         }
+        
+        this.inventory = inventory;
             
         initComponents();
         init(inventory);
@@ -147,7 +149,10 @@ public class InventoryDialog extends javax.swing.JDialog {
                     return;
                 }
 
-                boolean updateSuccessful = model.update();
+                int row = itemsTable.getSelectedRow();
+                
+                boolean updateSuccessful = model.update(row, inventory );
+                
 
                 if(!updateSuccessful)
                 {
@@ -281,9 +286,8 @@ public class InventoryDialog extends javax.swing.JDialog {
                     .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(deleteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(drillButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, Short.MAX_VALUE)
-                        .addComponent(doneButton, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)))
+                    .addComponent(refreshButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 29, Short.MAX_VALUE)
+                    .addComponent(doneButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -297,6 +301,9 @@ public class InventoryDialog extends javax.swing.JDialog {
         Item item = model.getRow(row);
 
         System.out.println(item);
+        
+        model.refresh();
+        refresh();
     }
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
@@ -304,43 +311,54 @@ public class InventoryDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
+        
+        
+        
+        final InventoryDialog frame = this;
+        final Inventory inventoryP = this.inventory;
+        final Item item = new Item("");
+
+        refresh();
+       
+        SwingUtilities.invokeLater(new Runnable() {            
             public void run() {
-                try
-                {
-                    // Displays add item dialog
-                    AddItemDialog itemDialog =
-                            new AddItemDialog( parentFrame , true);
+                // Displays add stock dialog
+                AddItemDialog itemDialog = new AddItemDialog( null, inventoryP, item, true);
+                itemDialog.setVisible(true);
+                itemDialog.setTitle("Add new item");
 
-                    itemDialog.setVisible(true);
-
-                    if(itemDialog.addedItem())
-                    {
-                        Item itemToAdd = itemDialog.newItem();
-                        ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
-                        boolean addSuccessful = model.add(itemToAdd);
-
-                        if(!addSuccessful)
-                        {
-                            JOptionPane.showMessageDialog(parentFrame, "Add failed!",
-                                "Inventory Control - Inventories",
-                                JOptionPane.ERROR_MESSAGE);
-                        }
-                        else
-                        {
-                            model.refresh();
-                        }
-                    }
-                } catch (Exception e) {
-                    //Logger.log(e.toString());
-                }
+                refresh();
             }
         });
+  
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        // Add delete code here
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                
+                int row = itemsTable.getSelectedRow();
+
+                ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
+                boolean deleteSuccessful = model.delete(row);
+
+                if(!deleteSuccessful)
+                {
+                        JOptionPane.showMessageDialog(null, "Delete failed!",
+                            "Inventory Control - Item",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                {
+                    model.refresh();
+                }
+                
+                refresh();
+            }
+        });
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
@@ -350,6 +368,8 @@ public class InventoryDialog extends javax.swing.JDialog {
     private void drillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillButtonActionPerformed
         
         final InventoryDialog frame = this;
+        
+        refresh();
 
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -360,6 +380,8 @@ public class InventoryDialog extends javax.swing.JDialog {
                 ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
 
                 Item itemToExamine = model.getRow(row);
+                
+                
 
                 ItemDialog itemDialog = new ItemDialog(null, model.getInventory(), itemToExamine, true);
                 itemDialog.setVisible(true);
@@ -367,7 +389,7 @@ public class InventoryDialog extends javax.swing.JDialog {
         });
         
     }//GEN-LAST:event_drillButtonActionPerformed
-
+    
     /**
     * @param args the command line arguments
     */

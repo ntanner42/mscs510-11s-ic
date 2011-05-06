@@ -13,18 +13,26 @@ package client;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import javax.swing.JOptionPane;
+import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Item;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
  * @author Neal
+ * @author Brian Gormanly
  */
 public class AddItemDialog extends javax.swing.JDialog
 {
     private boolean addedItem = false;
+    
+    private Item thisItem;
+    private Inventory currentInventory;
 
     /** Creates new form AddItemDialog */
-    public AddItemDialog(java.awt.Frame parent, boolean modal)
+    public AddItemDialog(java.awt.Frame parent, Inventory inventory, Item item, boolean modal)
     {
         super(parent, modal);
 
@@ -32,6 +40,9 @@ public class AddItemDialog extends javax.swing.JDialog
         try
         {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            currentInventory = inventory;
+            thisItem = item;
+            
         }
         catch (Exception ex)
         {
@@ -66,17 +77,7 @@ public class AddItemDialog extends javax.swing.JDialog
         return this.addedItem;
     }
 
-    public Item newItem()
-    {
-        Item itemToReturn = new Item("");
 
-        itemToReturn.setName(itemNameTextField.getText());
-        itemToReturn.setDescription(itemDescriptionTextField.getText());
-        itemToReturn.setModelNumber(itemModelTextField.getText());
-        itemToReturn.setOem(itemOEMTextField.getText());
-
-        return itemToReturn;
-    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -212,31 +213,93 @@ public class AddItemDialog extends javax.swing.JDialog
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        
+        
+        String nameEntered = itemNameTextField.getText();
+        String descriptionEntered = itemDescriptionTextField.getText();
+        String modelNumber = itemModelTextField.getText();
+        String oemNumber = itemOEMTextField.getText();
+        String reorderThres = reorderThresholdTextField.getText();
+        
+
+        if((nameEntered.equals("") && descriptionEntered.equals("")) ||
+                (nameEntered.equals("Enter the inventory name") &&
+                    descriptionEntered.equals("Enter the inventory description")))
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a name and a description",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if(nameEntered.equals("") || nameEntered.equals("Enter the inventory name"))
+        {
+            JOptionPane.showMessageDialog(this, "Please enter a name",
+                        "Name missing", JOptionPane.ERROR_MESSAGE);               
+        }
+        else if(descriptionEntered.equals("") || descriptionEntered.equals("Enter the inventory description"))
+        {
+            JOptionPane.showMessageDialog(this, "Please enter a description",
+                        "Description missing", JOptionPane.ERROR_MESSAGE);            
+        }
+        else
+        {
+            Item thisItem = new Item(nameEntered);
+
+            thisItem.setName(nameEntered);
+            thisItem.setDescription(descriptionEntered);
+            thisItem.setInventoryId(currentInventory.getId());
+            thisItem.setModelNumber(modelNumber);
+            thisItem.setOem(oemNumber);
+            thisItem.setStockThreshold(Integer.parseInt(reorderThres));
+
+            currentInventory.insert(thisItem);
+                    
+                    
+            System.out.println(thisItem.getId());
+            
+            WorkletContext context = WorkletContext.getInstance();
+
+            if (!Helper.insert(thisItem, "Inventories", context)) {
+                System.out.println("insert Item into Inventory failed!");
+            }
+
+            System.out.println(thisItem.getId());
+
+
+            dispose();
+        }
+        
+        
+        
+        
         this.setVisible(false);
         this.addedItem = true;
 }//GEN-LAST:event_saveButtonActionPerformed
 
+    private void insertItem(Item item){
+        
+        
+        
+        final AddItemDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+         System.out.println(item.getId());
+         
+         if (!Helper.insert(item, "Inventories", context)) {
+                        System.out.println("insert Item into Inventory failed!");
+                    }
+         
+         System.out.println(item.getId());
+
+        // System.out.println(inventory.getId());
+
+    }// end insert
+    
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.setVisible(false);
         this.addedItem = false;
 }//GEN-LAST:event_cancelButtonActionPerformed
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AddItemDialog dialog = new AddItemDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;

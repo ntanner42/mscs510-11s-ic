@@ -5,10 +5,6 @@
 
 package client;
 
-/**
- *
- * @author Neal
- */
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
@@ -19,9 +15,11 @@ import org.workplicity.worklet.WorkletContext;
 /**
  *
  * @author Neal
+ * @author Brian Gormamnly
  */
 public class InventoriesTableModel extends AbstractTableModel
 {
+    private Inventory inventory = null;
     private ArrayList<Inventory> inventories = new ArrayList<Inventory>( );
     private HashMap<Integer,Inventory> dirty = new HashMap<Integer,Inventory>( );
 
@@ -36,8 +34,16 @@ public class InventoriesTableModel extends AbstractTableModel
     public boolean add(Inventory inventoryToAdd)
     {
         WorkletContext context = WorkletContext.getInstance();
+        
+        boolean success = Helper.insert(inventoryToAdd, "Inventories",context);
+        System.out.println("Insert of " + inventoryToAdd.getName() + " successful! " + inventoryToAdd.getId());
+        
+        dirty.put(inventoryToAdd.getId(),inventoryToAdd);
 
-        return Helper.insert(inventoryToAdd, "Inventories",context);
+        this.fireTableDataChanged();
+        
+
+        return success;
     }
 
     public boolean delete(int row)
@@ -45,8 +51,16 @@ public class InventoriesTableModel extends AbstractTableModel
         WorkletContext context = WorkletContext.getInstance();
 
         Inventory inventoryToDelete = inventories.get(row);
+        inventories.remove(row);
 
-        return Helper.delete(inventoryToDelete, "Inventories", context);
+        Helper.delete(inventoryToDelete, "Inventories", context);
+        
+        dirty.put(inventoryToDelete.getId(),inventoryToDelete);
+
+        this.fireTableDataChanged();
+        
+        return true;
+       
     }
 
     @Override
@@ -111,9 +125,11 @@ public class InventoriesTableModel extends AbstractTableModel
             {
                 valueToReturn = inventory.getDescription();        
             }
+            
+            //System.out.println("success .. " + inventory.getId());
         }
         catch (Exception e) {
-            System.out.println("Incorrect Type..");
+            System.out.println(e);
             return null;
         }
         
@@ -144,33 +160,55 @@ public class InventoriesTableModel extends AbstractTableModel
 
     public void refresh()
     {
+ 
         WorkletContext context = WorkletContext.getInstance();
 
-        inventories = Helper.query("Inventories", "/list", context);
-
-        dirty.clear();
-
-        this.fireTableDataChanged();
-    }
-
-    public boolean update()
-    {
-        // Saves the changes to the table
-        boolean updateComplete = true;
-
-        WorkletContext context = WorkletContext.getInstance();
-
-        for(Integer id : dirty.keySet()) {
-            Inventory inventory = dirty.get(id);
-
-            if(!Helper.insert(inventory, "Inventories",context))
-            {
-                updateComplete = false;
-                break;
+        try {
+            inventories = Helper.query("Inventories", "/list", context);
+        }
+        catch(Exception e) {
+            System.out.println("not an inventory");
+        }
+        
+        // filter out the non-inventory
+        try {
+            for(int i=0; i<inventories.size(); i++) {
+                try {
+                    Inventory thisInvetory = inventories.get(i);
+                }
+                catch(Exception e) {
+                    System.out.println("not an inventory");
+                    inventories.remove(inventories.get(i));
+                    i--;
+                }
             }
         }
+        catch(IndexOutOfBoundsException e) {
+            System.out.println("The array shrunk and needed to abort");
+        }
+        
+        if (inventories.size() > 0) {
 
-        return updateComplete;
+            dirty.clear();
+
+            this.fireTableDataChanged();
+        
+        }
+        
+        
+
+        
+    }
+
+    public boolean update(int row)
+    {
+        
+        WorkletContext context = WorkletContext.getInstance();
+        
+        Inventory inventory = inventories.get(row);
+
+        return Helper.insert(inventory, "Inventories", context);
+
     }
 
     public Inventory getRow(int row)
@@ -181,5 +219,15 @@ public class InventoriesTableModel extends AbstractTableModel
     public HashMap<Integer,Inventory> getDirty()
     {
         return dirty;
+    }
+    
+    public Inventory getInventory()
+    {
+        return inventory;
+    }
+    
+    public void setInventory(Inventory inventory)
+    {
+        this.inventory = inventory;
     }
 }

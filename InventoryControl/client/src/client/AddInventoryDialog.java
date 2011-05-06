@@ -27,9 +27,10 @@ import org.workplicity.worklet.WorkletContext;
 public class AddInventoryDialog extends javax.swing.JDialog
 {
     private boolean addedInventory = false;
+    private static Inventory thisInventory = new Inventory("");
 
     /** Creates new form AddInventoryDialog */
-    public AddInventoryDialog(java.awt.Frame parent, boolean modal)
+    public AddInventoryDialog(java.awt.Frame parent, Inventory inventory, boolean modal)
     {
         super(parent, modal);
 
@@ -37,6 +38,7 @@ public class AddInventoryDialog extends javax.swing.JDialog
         try
         {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            this.thisInventory = inventory;
         }
         catch (Exception ex)
         {
@@ -160,10 +162,9 @@ public class AddInventoryDialog extends javax.swing.JDialog
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         
-        WorkletContext context = WorkletContext.getInstance();
-        
         String nameEntered = inventoryNameTextField.getText();
         String descriptionEntered = inventoryDescriptionTextField.getText();
+        
 
         if((nameEntered.equals("") && descriptionEntered.equals("")) ||
                 (nameEntered.equals("Enter the inventory name") &&
@@ -186,17 +187,12 @@ public class AddInventoryDialog extends javax.swing.JDialog
         }
         else
         {
-            
-            
-            // Do add to datastore
-            Inventory inventory = newInventory();
-            
-            if (!Helper.insert(inventory, "Inventories", context)) {
-                System.out.println("insert Item into Inventory failed!");
-            }
-            
-            this.setVisible(false);
-            this.addedInventory = true;
+            Inventory thisInventory = new Inventory(nameEntered);
+            thisInventory.setName(nameEntered);
+            thisInventory.setDescription(descriptionEntered);
+            insertInventory(thisInventory);
+
+            dispose();
         }
 }//GEN-LAST:event_saveButtonActionPerformed
 
@@ -210,13 +206,23 @@ public class AddInventoryDialog extends javax.swing.JDialog
         return this.addedInventory;
     }
 
-    public Inventory newInventory()
-    {
-        Inventory inventoryToReturn = new Inventory("");
-        inventoryToReturn.setName(inventoryNameTextField.getText());
-        inventoryToReturn.setDescription(inventoryDescriptionTextField.getText());
-        return inventoryToReturn;
-    }
+    
+    private void insertInventory(Inventory inventory){
+
+        final AddInventoryDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+         System.out.println(inventory.getId());
+
+         if (!Helper.insert(inventory, "Inventories", context)) {
+             JOptionPane.showMessageDialog(frame, "insert Inventory failed!",
+                "Inventories", JOptionPane.ERROR_MESSAGE);
+
+         }// end if
+
+         System.out.println(inventory.getId());
+
+    }// end insert
 
     /**
     * @param args the command line arguments
@@ -224,7 +230,7 @@ public class AddInventoryDialog extends javax.swing.JDialog
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                AddInventoryDialog dialog = new AddInventoryDialog(new javax.swing.JFrame(), true);
+                AddInventoryDialog dialog = new AddInventoryDialog(new javax.swing.JFrame(), thisInventory, true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
