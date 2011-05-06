@@ -6,7 +6,6 @@
 
 package client;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -151,8 +150,10 @@ public class MainFrameView extends FrameView {
                     model.refresh();
                     return;
                 }
-
-                boolean updateSuccessful = model.update();
+                
+                int row = inventoriesTable.getSelectedRow();
+                
+                boolean updateSuccessful = model.update(row);
 
                 if(!updateSuccessful)
                 {
@@ -338,35 +339,15 @@ public class MainFrameView extends FrameView {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                try
-                {
-                    // Displays add inventory dialog
-                    AddInventoryDialog inventoryDialog =
-                            new AddInventoryDialog( null , true);
-
-                    inventoryDialog.setVisible(true);
-
-                    if(inventoryDialog.addedInventory())
-                    {
-                        Inventory inventoryToAdd = inventoryDialog.newInventory();
-                        InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
-                        boolean addSuccessful = model.add(inventoryToAdd);
-
-                        if(!addSuccessful)
-                        {
-                            JOptionPane.showMessageDialog(frame, "Add failed!",
-                                "Inventory Control - Inventories",
-                                JOptionPane.ERROR_MESSAGE);
-                        }
-                        else
-                        {
-                            model.refresh();
-                        }
-                    }
-                } catch (Exception e) {
-                    //Logger.log(e.toString());
-                }
+                // Displays add stock dialog
+                final Inventory inventory = new Inventory("");
+                AddInventoryDialog stockDialog = new AddInventoryDialog(null, inventory, true);
+                stockDialog.setVisible(true);
+                stockDialog.setTitle("Add new stock");
+                
+                refresh();
             }
+          
         });
     }//GEN-LAST:event_addButtonActionPerformed
 
@@ -396,11 +377,61 @@ public class MainFrameView extends FrameView {
                 {
                     model.refresh();
                 }
+                
+                refresh();
             }
         });
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void byeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_byeButtonActionPerformed
+        
+        final JFrame frame = this.getFrame();
+        
+        InventoriesTableModel model = (InventoriesTableModel) inventoriesTable.getModel();
+
+        final HashMap<Integer, Inventory> dirty = model.getDirty();
+
+        if (model.getDirty().isEmpty()) {
+            model.refresh();
+            this.getFrame().dispose();
+            return;
+        }
+
+        String msg = "Some inventories have changed.";
+        msg += "\nSave them?";
+
+        int n = JOptionPane.showConfirmDialog(
+                frame,
+                msg,
+                "Confirm",
+                JOptionPane.YES_NO_OPTION);
+
+        if (n == 1) {
+            model.refresh();
+            this.getFrame().dispose();
+            return;
+        }
+
+        int row = inventoriesTable.getSelectedRow();
+
+        boolean updateSuccessful = false;
+        
+        if(row >= 0) {
+            updateSuccessful = model.update(row);
+        }
+
+        if(!updateSuccessful)
+        {
+            JOptionPane.showMessageDialog(frame, "Saved failed! Plesae select the row that need to be saved!",
+                "Inventory Control - Inventories",
+                JOptionPane.ERROR_MESSAGE);
+                return;
+        }
+        else
+        {
+            model.refresh();
+        }
+        
         this.getFrame().dispose();
     }//GEN-LAST:event_byeButtonActionPerformed
 
