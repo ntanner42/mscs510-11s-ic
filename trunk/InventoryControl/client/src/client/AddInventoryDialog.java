@@ -162,31 +162,26 @@ public class AddInventoryDialog extends javax.swing.JDialog
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         
+        String errorMessage = "";
+        
         String nameEntered = inventoryNameTextField.getText();
         String descriptionEntered = inventoryDescriptionTextField.getText();
         
-
-        if((nameEntered.equals("") && descriptionEntered.equals("")) ||
-                (nameEntered.equals("Enter the inventory name") &&
-                    descriptionEntered.equals("Enter the inventory description")))
-        {
+        if(nameEntered.equals("") || nameEntered.equals("Inventory name")) {
+            errorMessage += "Plaese enter a valid name\n";
+        }
+        if(descriptionEntered.equals("") || descriptionEntered.equals("Inventory description")) {
+            errorMessage += "Please enter a Description\n";
+        }
+        
+        
+        if(errorMessage.length() > 0) {
             JOptionPane.showMessageDialog(this,
-                        "Please enter a name and a description",
+                        errorMessage,
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        else if(nameEntered.equals("") || nameEntered.equals("Enter the inventory name"))
-        {
-            JOptionPane.showMessageDialog(this, "Please enter a name",
-                        "Name missing", JOptionPane.ERROR_MESSAGE);               
-        }
-        else if(descriptionEntered.equals("") || descriptionEntered.equals("Enter the inventory description"))
-        {
-            JOptionPane.showMessageDialog(this, "Please enter a description",
-                        "Description missing", JOptionPane.ERROR_MESSAGE);            
-        }
-        else
-        {
+        else {
             Inventory thisInventory = new Inventory(nameEntered);
             thisInventory.setName(nameEntered);
             thisInventory.setDescription(descriptionEntered);

@@ -110,6 +110,11 @@ public class AddItemDialog extends javax.swing.JDialog
 
         itemNameTextField.setText(resourceMap.getString("itemNameTextField.text")); // NOI18N
         itemNameTextField.setName("itemNameTextField"); // NOI18N
+        itemNameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemNameTextFieldActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
@@ -157,24 +162,22 @@ public class AddItemDialog extends javax.swing.JDialog
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(itemOEMTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(itemDescriptionTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(itemModelTextField, javax.swing.GroupLayout.Alignment.LEADING))
-                    .addComponent(reorderThresholdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(itemNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(162, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(258, Short.MAX_VALUE)
-                .addComponent(saveButton)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(itemOEMTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                            .addComponent(itemDescriptionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                            .addComponent(itemModelTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                            .addComponent(itemNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(reorderThresholdTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)))
+                    .addComponent(saveButton, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cancelButton)
                 .addContainerGap())
@@ -213,67 +216,80 @@ public class AddItemDialog extends javax.swing.JDialog
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        
+        String errorMessage = "";
         
         String nameEntered = itemNameTextField.getText();
         String descriptionEntered = itemDescriptionTextField.getText();
         String modelNumber = itemModelTextField.getText();
         String oemNumber = itemOEMTextField.getText();
-        String reorderThres = reorderThresholdTextField.getText();
+        Integer reorderThres;
         
-
-        if((nameEntered.equals("") && descriptionEntered.equals("")) ||
-                (nameEntered.equals("Enter the inventory name") &&
-                    descriptionEntered.equals("Enter the inventory description")))
-        {
+        try {
+             reorderThres = Integer.parseInt(reorderThresholdTextField.getText());
+        }
+        catch(Exception e) {
+            reorderThres = 1;
+            errorMessage = "Non numeric value entered for order threshold, Value much be 1 or greater.\n";
+        }
+        
+        if(nameEntered.equals("") || nameEntered.equals("Item name")) {
+            errorMessage += "Plaese enter a valid name\n";
+        }
+        if(descriptionEntered.equals("") || descriptionEntered.equals("Item description")) {
+            errorMessage += "Please enter a Description\n";
+        }
+        if(modelNumber.equals("") || modelNumber.equals("Item model")) {
+            errorMessage += "Plaese enter a valid model\n";
+        }
+        if(oemNumber.equals("") || oemNumber.equals("Item OEM")) {
+            errorMessage += "Plaese enter a valid OEM\n";
+        }
+        if(reorderThres < 1) {
+            errorMessage += "Plaese enter a valid re-order threshold larger then 0\n";
+        }
+        
+        
+        if(errorMessage.length() > 0) {
             JOptionPane.showMessageDialog(this,
-                        "Please enter a name and a description",
+                        errorMessage,
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        else if(nameEntered.equals("") || nameEntered.equals("Enter the inventory name"))
-        {
-            JOptionPane.showMessageDialog(this, "Please enter a name",
-                        "Name missing", JOptionPane.ERROR_MESSAGE);               
-        }
-        else if(descriptionEntered.equals("") || descriptionEntered.equals("Enter the inventory description"))
-        {
-            JOptionPane.showMessageDialog(this, "Please enter a description",
-                        "Description missing", JOptionPane.ERROR_MESSAGE);            
-        }
         else
         {
-            Item thisItem = new Item(nameEntered);
+            try {
+                Item thisItem = new Item(nameEntered);
 
-            thisItem.setName(nameEntered);
-            thisItem.setDescription(descriptionEntered);
-            thisItem.setInventoryId(currentInventory.getId());
-            thisItem.setModelNumber(modelNumber);
-            thisItem.setOem(oemNumber);
-            thisItem.setStockThreshold(Integer.parseInt(reorderThres));
+                thisItem.setName(nameEntered);
+                thisItem.setDescription(descriptionEntered);
+                thisItem.setInventoryId(currentInventory.getId());
+                thisItem.setModelNumber(modelNumber);
+                thisItem.setOem(oemNumber);
+                thisItem.setStockThreshold(reorderThres);
 
-            currentInventory.insert(thisItem);
-                    
-                    
-            System.out.println(thisItem.getId());
-            
-            WorkletContext context = WorkletContext.getInstance();
+                currentInventory.insert(thisItem);
 
-            if (!Helper.insert(thisItem, "Inventories", context)) {
-                System.out.println("insert Item into Inventory failed!");
+
+                System.out.println(thisItem.getId());
+
+                WorkletContext context = WorkletContext.getInstance();
+
+                if (!Helper.insert(thisItem, "Inventories", context)) {
+                    System.out.println("insert Item into Inventory failed!");
+                }
+
+                System.out.println(thisItem.getId());
+            }
+            catch(Exception e) {
+                JOptionPane.showMessageDialog(this, "Error saving record",
+                        "Item save failed", JOptionPane.ERROR_MESSAGE);
             }
 
-            System.out.println(thisItem.getId());
-
-
+            this.setVisible(false);
+            this.addedItem = true;
+            
             dispose();
         }
-        
-        
-        
-        
-        this.setVisible(false);
-        this.addedItem = true;
 }//GEN-LAST:event_saveButtonActionPerformed
 
     private void insertItem(Item item){
@@ -299,6 +315,10 @@ public class AddItemDialog extends javax.swing.JDialog
         this.setVisible(false);
         this.addedItem = false;
 }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void itemNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemNameTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_itemNameTextFieldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

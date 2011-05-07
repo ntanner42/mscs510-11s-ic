@@ -362,14 +362,13 @@ public class InventoryDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
+        refresh();
         this.setVisible(false);
     }//GEN-LAST:event_doneButtonActionPerformed
 
     private void drillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillButtonActionPerformed
         
         final InventoryDialog frame = this;
-        
-        refresh();
 
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -380,11 +379,11 @@ public class InventoryDialog extends javax.swing.JDialog {
                 ItemsTableModel model = (ItemsTableModel) itemsTable.getModel();
 
                 Item itemToExamine = model.getRow(row);
-                
-                
 
                 ItemDialog itemDialog = new ItemDialog(null, model.getInventory(), itemToExamine, true);
                 itemDialog.setVisible(true);
+                
+                refresh();
             }
         });
         
