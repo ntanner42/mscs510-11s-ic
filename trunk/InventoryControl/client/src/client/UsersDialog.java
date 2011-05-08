@@ -11,8 +11,6 @@
 
 package client;
 
-import java.awt.Component;
-import java.awt.Frame;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -23,7 +21,7 @@ import javax.swing.JTable;
 
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
-import org.workplicity.entry.User;
+import org.workplicity.elog.entry.ElogUser;
 
 import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
@@ -33,12 +31,9 @@ import org.workplicity.worklet.WorkletContext;
  *
  * @author Krishnan & Vageesh
  */
-public class UsersDialog extends javax.swing.JDialog {
-
-    private ArrayList<User> Users = new ArrayList<User>( );
-    private static WorkletContext context = WorkletContext.getInstance();
-
-
+public class UsersDialog extends javax.swing.JDialog
+{
+    private ArrayList<ElogUser> Users = new ArrayList<ElogUser>( );
 
     /** Creates new form UsersDialog */
     public UsersDialog(java.awt.Frame parent, boolean modal) {
@@ -46,33 +41,39 @@ public class UsersDialog extends javax.swing.JDialog {
         initComponents();
 
         init();
+        initUserTable();
     }
 
     // --Code for setting look&feel and centering to Users dialog
-    private void init(){
-
+    private void init()
+    {
         this.setTitle("Users");
         this.setLocationRelativeTo(null);
-        try{
+
+        try
+        {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         }
-        catch (Exception e){
+        catch (Exception e)
+        {
 
         }
-        initUserTable();
-
     }
 
     // --Code for setting the width of the usersTable columns
-    private void initUserTable(){
-
+    private void initUserTable()
+    {
         usersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         final int[] WIDTHS = {
-            42, // User ID
-            100, // User name
-            160, //User address
-            80 //User Phone number
+            42,     // User ID
+            80,    // Updated
+            80,     // Username
+            80,     // Password
+            80,     // First name
+            80,     // Last name
+            80,     // Phone #
+            110      // E-mail address
         };
 
         for(int i = 0 ; i<WIDTHS.length; i++)
@@ -100,7 +101,6 @@ public class UsersDialog extends javax.swing.JDialog {
         UsersTableModel model = (UsersTableModel) usersTable.getModel();
 
         model.refresh();
-
     }
 
     /** This method is called from within the constructor to
@@ -170,10 +170,10 @@ public class UsersDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(refreshButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 231, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 396, Short.MAX_VALUE)
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteButton)
@@ -216,29 +216,28 @@ public class UsersDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_doneButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        // TODO add your handling code here:
-          //final  User stock = Users.get(0);
-
-
-        refreshUser();
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                // Displays add stock dialog
+                // Displays add item dialog
                 AddUserDialog userDialog =
                         new AddUserDialog( null , true);
                 userDialog.setVisible(true);
                 userDialog.setTitle("Add new User");
 
-                refreshUser();
+                if(userDialog.addedUser())
+                {
+                    UsersTableModel model = (UsersTableModel) usersTable.getModel();
+                    ElogUser userToAdd = userDialog.newUser();
+                    model.add(userToAdd);
+
+                    refreshUser();
+                }//end if
             }
         });
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
-        // TODO add your handling code here:
-
-         final UsersDialog frame = this;
+        final UsersDialog frame = this;
 
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -246,20 +245,16 @@ public class UsersDialog extends javax.swing.JDialog {
             {
                 UsersTableModel model = (UsersTableModel) usersTable.getModel();
                 int row = usersTable.getSelectedRow();
-                if (row == -1){
-
-                        JOptionPane.showMessageDialog(frame,
+                if (row == -1)
+                {
+                    JOptionPane.showMessageDialog(frame,
                         "Please select a user from the table to delete ",
                         "No selection made",
                         JOptionPane.ERROR_MESSAGE);
-
-                }
+                }//end if
                 else
-                 {
-                    User stock = editUserRequest(row);
-
-                   // TODO add delete stock handling code here:
-                    String msg = "Are sure to delete this user?";
+                {
+                    String msg = "Are you sure you want to delete this user?";
 
                     int n = JOptionPane.showConfirmDialog(
                             null,
@@ -267,147 +262,112 @@ public class UsersDialog extends javax.swing.JDialog {
                             "Confirm",
                             JOptionPane.YES_NO_OPTION);
 
-                    if (n == 1) {
+                    if (n == 1)
+                    {
                         return;
-
                     }
 
-                    try{
-                        if (!Helper.delete(stock, "Inventories", context)) {
-                            System.out.print("Delete failed!");
+                    try
+                    {
+                        if (model.delete(row))
+                        {
+
+                            System.out.print("Delete successful");
                         }
                         else
                         {
-                            System.out.print("Delete successful");
+                            System.out.print("Delete failed!");
                         }
-                     }catch(Exception ex){
+                    }
+                    catch(Exception ex)
+                    {
 
-                     }
-                     }
+                    }
+                 }
 
-                     refreshUser();
-                     model.fireTableDataChanged();
-
-                }
-
-            private User editUserRequest(int row) {
-
-        UsersTableModel stockModel = (UsersTableModel) usersTable.getModel();
-
-        User selectedStock = stockModel.getRow(row);
-
-        return selectedStock;
-        //System.out.println(selectedStock);
-    }
-
-
-          });
-        
-       
+                 model.refresh();
+            }
+          });        
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-        // TODO add your handling code here:
-
-         SwingUtilities.invokeLater(new Runnable() {
-
-           public void run() {
-
+         SwingUtilities.invokeLater(new Runnable()
+         {
+            public void run()
+            {
                 refreshUser();
-
-
              }// end run
-
-        });// end swing utilities
+         });// end swing utilities
     }//GEN-LAST:event_refreshButtonActionPerformed
 
-   
+    private void refreshUser()
+    {
+        final UsersDialog frame = this;
 
-  
-  
+        UsersTableModel model = (UsersTableModel) usersTable.getModel();
 
-      private void refreshUser(){
+        final HashMap<Integer, ElogUser> dirty = model.getDirty();
 
-            final UsersDialog frame = this;
-
-          //  User user = current.get(0);
-
-            UsersTableModel model = (UsersTableModel) usersTable.getModel();
-
-            final HashMap<Integer, User> dirty = model.getDirty();
-
-            if (model.getDirty().isEmpty()) {
-                model.refresh();
-                return;
-            }
-
+        if (model.getDirty().isEmpty())
+        {
+            model.refresh();
+        }//end if
+        else
+        {
             String msg = "Some Users have changed.";
             msg += "\nSave them?";
 
             int n = JOptionPane.showConfirmDialog(
-                    frame,
-                    msg,
-                    "Confirm",
-                    JOptionPane.YES_NO_OPTION);
+                        frame,
+                        msg,
+                        "Confirm",
+                        JOptionPane.YES_NO_OPTION);
 
-            if (n == 1) {
+            if (n == 1)
+            {
                 model.refresh();
-                return;
-            }
+            }//end if
+            else
+            {
+                saveUser();
+            }//end else
+        }//end else
+    }// end refresh users
 
-          saveUser();
-
-
-
-    }// end refresh stock
-
-
-       private void saveUser() {
+    private void saveUser()
+    {
         final UsersDialog frame = this;
+
         WorkletContext context = WorkletContext.getInstance();
 
         UsersTableModel model = (UsersTableModel) usersTable.getModel();
-        final HashMap<Integer, User> dirty = model.getDirty();
+        final HashMap<Integer, ElogUser> dirty = model.getDirty();
 
-        String criteria = "/list";
-        ArrayList<User> users = Helper.query("Users", criteria, context);
+        for(Integer id : dirty.keySet())
+        {
+            ElogUser user = dirty.get(id);
 
+            if (!Helper.insert(user, "Accounts", context))
+            {
+                JOptionPane.showMessageDialog(frame, "insert Users failed!",
+                    "Users", JOptionPane.ERROR_MESSAGE);
+            }//end if
 
+            System.out.println(user.getId());
+        }// end foreach
 
-                   for(Integer id : dirty.keySet()) {
-                    User user = dirty.get(id);
-
-                      //       item.insert(stock);
-
-                        //     System.out.println(user.getId());
-
-                             if (!Helper.insert(user, "Users", context)) {
-                                 JOptionPane.showMessageDialog(frame, "insert Users failed!",
-                                    "Users", JOptionPane.ERROR_MESSAGE);
-
-                             }
-
-                                System.out.println(user.getId());
-
-                    }// end foreach
-                          model.refresh();
-              }// end for
-
-
-
-
-
-
-
+        model.refresh();
+    }// saveUser
 
     /**
     * @param args the command line arguments
     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-       
-                try {
+            public void run()
+            {
+                try
+                {
 
                    WorkletContext context = WorkletContext.getInstance();
                    NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
@@ -416,13 +376,14 @@ public class UsersDialog extends javax.swing.JDialog {
                             throw new Exception("login failed");
 
                     String criteria = "/list";
-                    //Issuing the query using the helper to the Inventories repository
-                   ArrayList<User> users = Helper.query("Accounts", criteria, context);
-                    if (users == null) {
+                    //Issuing the query using the helper to the Accounts     repository
+                   ArrayList<ElogUser> users = Helper.query("Accounts", criteria, context);
+                    if (users == null)
+                    {
                         throw new Exception("bad query");
                     }
 
-                    User user = users.get(0);
+                    ElogUser user = users.get(0);
 
                     
 

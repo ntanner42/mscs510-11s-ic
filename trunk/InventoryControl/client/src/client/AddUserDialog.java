@@ -8,24 +8,18 @@
  *
  * Created on Apr 6, 2011, 1:56:22 PM
  */
-
 package client;
 
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import org.workplicity.entry.User;
-import org.workplicity.entry.WorkSlate;
-import org.workplicity.task.NetTask;
-import org.workplicity.util.Helper;
-import org.workplicity.worklet.WorkletContext;
+import org.workplicity.elog.entry.ElogUser;
 
 /**
  *
  * @author Krishnan & Vageesh
  */
 public class AddUserDialog extends javax.swing.JDialog {
+
     private boolean addedUser = false;
-    private ArrayList<User> Users = new ArrayList<User>( );
 
     /** Creates new form AddUserDialog */
     public AddUserDialog(java.awt.Frame parent, boolean modal) {
@@ -33,11 +27,10 @@ public class AddUserDialog extends javax.swing.JDialog {
         initComponents();
 
         this.setLocationRelativeTo(null);
-         this.setTitle("Add User");
+        this.setTitle("Add User");
     }
 
-    public boolean addedUser()
-    {
+    public boolean addedUser() {
         return this.addedUser;
     }
 
@@ -50,38 +43,27 @@ public class AddUserDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        lnameTextField = new javax.swing.JTextField();
+        lastNameTextField = new javax.swing.JTextField();
         saveButton = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        fnameTextField = new javax.swing.JTextField();
+        firstNameTextField = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         cancelButton = new javax.swing.JButton();
         phoneTextField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         emailTextField = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        passwordTextField = new javax.swing.JTextField();
+        userNameTextField = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        jLabel1.setName("User"); // NOI18N
-
-        jLabel2.setName("jLabel2"); // NOI18N
-
-        jLabel3.setName("jLabel3"); // NOI18N
+        lastNameTextField.setName("lastNameTextField"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(AddUserDialog.class);
-        lnameTextField.setText(resourceMap.getString("lnameTextField.text")); // NOI18N
-        lnameTextField.setName("lnameTextField"); // NOI18N
-        lnameTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lnameTextFieldActionPerformed(evt);
-            }
-        });
-
         saveButton.setText(resourceMap.getString("saveButton.text")); // NOI18N
         saveButton.setName("saveButton"); // NOI18N
         saveButton.addActionListener(new java.awt.event.ActionListener() {
@@ -93,13 +75,7 @@ public class AddUserDialog extends javax.swing.JDialog {
         jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
         jLabel4.setName("jLabel4"); // NOI18N
 
-        fnameTextField.setText(resourceMap.getString("fnameTextField.text")); // NOI18N
-        fnameTextField.setName("fnameTextField"); // NOI18N
-        fnameTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fnameTextFieldActionPerformed(evt);
-            }
-        });
+        firstNameTextField.setName("firstNameTextField"); // NOI18N
 
         jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
         jLabel5.setName("jLabel5"); // NOI18N
@@ -112,129 +88,139 @@ public class AddUserDialog extends javax.swing.JDialog {
             }
         });
 
-        phoneTextField.setText(resourceMap.getString("PhoneTextField.text")); // NOI18N
         phoneTextField.setName("PhoneTextField"); // NOI18N
 
         jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
         jLabel6.setName("jLabel6"); // NOI18N
 
-        emailTextField.setText(resourceMap.getString("emailTextField.text")); // NOI18N
         emailTextField.setName("emailTextField"); // NOI18N
 
         jLabel7.setText(resourceMap.getString("jLabel7.text")); // NOI18N
         jLabel7.setName("jLabel7"); // NOI18N
 
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        passwordTextField.setText(resourceMap.getString("passwordTextField.text")); // NOI18N
+        passwordTextField.setName("passwordTextField"); // NOI18N
+
+        userNameTextField.setText(resourceMap.getString("userNameTextField.text")); // NOI18N
+        userNameTextField.setName("userNameTextField"); // NOI18N
+
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(213, Short.MAX_VALUE)
-                .addComponent(saveButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cancelButton)
-                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3))
-                        .addGap(30, 30, 30))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel7))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(emailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fnameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(lnameTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(phoneTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)))
-                .addContainerGap(147, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(saveButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cancelButton))
+                    .addComponent(emailTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addComponent(phoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addComponent(lastNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addComponent(passwordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addComponent(userNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                    .addComponent(firstNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(userNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel2)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel3))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(fnameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel5)))
+                    .addComponent(jLabel1)
+                    .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(firstNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(lnameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lastNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cancelButton)
-                            .addComponent(saveButton)))
+                    .addComponent(jLabel6)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(phoneTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(emailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7))))
+                            .addComponent(jLabel7))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cancelButton)
+                            .addComponent(saveButton))))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void lnameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lnameTextFieldActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_lnameTextFieldActionPerformed
-
-    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
-
-        String firstname = fnameTextField.getText().toString();
-        String lastname = lnameTextField.getText().toString();
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {//GEN-FIRST:event_saveButtonActionPerformed
+        String username = userNameTextField.getText().toString();
+        String password = passwordTextField.getText().toString();
+        String firstname = firstNameTextField.getText().toString();
+        String lastname = lastNameTextField.getText().toString();
         String phoneNumber = phoneTextField.getText().toString();
         String email = emailTextField.getText().toString();
 
-
-
-             User newuser = Users.get(0);
-
-
-        if((firstname.equals("")  || firstname.equals("Enter the FirstName")) || firstname.isEmpty())
+        if(username.equals("") || username.isEmpty())
         {
             JOptionPane.showMessageDialog(this,
-                        "Please enter a FirstName ",
+                        "Please enter a username",
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        else if ((lastname.equals("")) || lastname.equals("Enter the LastName") || lastname.isEmpty()){
-
-            JOptionPane.showMessageDialog(this,
-                        "Please enter the LastName",
-                        "Required parameters missing",
-                        JOptionPane.ERROR_MESSAGE);
-        }
-        else if( phoneNumber.equals("") ||  phoneNumber.equals("Enter the phoneNumber") || phoneNumber.isEmpty())
+        else if(password.equals("") || password.isEmpty())
         {
             JOptionPane.showMessageDialog(this,
-                        "Please enter a  phoneNumber ",
+                        "Please enter a password",
                         "Required parameters missing",
                         JOptionPane.ERROR_MESSAGE);
         }
-        else if (email.equals("") || email.equals("Enter the email") || email.isEmpty()) {
+        else if(firstname.equals("") || firstname.isEmpty())
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a first name",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if ((lastname.equals("")) || lastname.isEmpty())
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter the last name",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if( phoneNumber.equals("") || phoneNumber.isEmpty())
+        {
+            JOptionPane.showMessageDialog(this,
+                        "Please enter a phone number ",
+                        "Required parameters missing",
+                        JOptionPane.ERROR_MESSAGE);
+        }
+        else if (email.equals("") || email.isEmpty())
+        {
 
             JOptionPane.showMessageDialog(this,
                         "Please enter the email",
@@ -243,32 +229,17 @@ public class AddUserDialog extends javax.swing.JDialog {
         }
         else
         {
-            newuser.setFirstName(firstname);
-            newuser.setLastName(lastname);
-            newuser.setPhone(phoneNumber);
-            newuser.setEmail(email);
-
-
-           insertUser(newuser);
-
-            dispose();
+			this.setVisible(false);
+			this.addedUser = true;
         }
+	}//GEN-LAST:event_saveButtonActionPerformed
 
-
-        
-}//GEN-LAST:event_saveButtonActionPerformed
-
-
-
-    private void fnameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fnameTextFieldActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_fnameTextFieldActionPerformed
-
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
-         this.setVisible(false);
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.setVisible(false);
         this.addedUser = false;
 }//GEN-LAST:event_cancelButtonActionPerformed
+
     //
     /**
     * @param args the command line arguments
@@ -278,6 +249,7 @@ public class AddUserDialog extends javax.swing.JDialog {
             public void run() {
                 AddUserDialog dialog = new AddUserDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -290,53 +262,36 @@ public class AddUserDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JTextField emailTextField;
-    private javax.swing.JTextField fnameTextField;
+    private javax.swing.JTextField firstNameTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JTextField lnameTextField;
+    private javax.swing.JTextField lastNameTextField;
+    private javax.swing.JTextField passwordTextField;
     private javax.swing.JTextField phoneTextField;
     private javax.swing.JButton saveButton;
+    private javax.swing.JTextField userNameTextField;
     // End of variables declaration//GEN-END:variables
 
-   public WorkSlate newUser() {
-         WorkSlate UserToReturn = new WorkSlate("");
-        UserToReturn.setName(fnameTextField.getText());
-        UserToReturn.setDescription(lnameTextField.getText());
-        UserToReturn.setDescription(phoneTextField.getText());
-        return UserToReturn;
-    }
+    public ElogUser newUser()
+    {
+        ElogUser userToReturn = new ElogUser();
 
-    private void insertUser(User newuser) {
-        final AddUserDialog frame = this;
-        WorkletContext context = WorkletContext.getInstance();
+        userToReturn.setLogname(userNameTextField.getText());
+        userToReturn.setPassword(passwordTextField.getText());
+        userToReturn.setFirstName(firstNameTextField.getText());
+        userToReturn.setLastName(lastNameTextField.getText());
+        userToReturn.setEmail(emailTextField.getText());
+        userToReturn.setPhone(phoneTextField.getText());
 
-        //StockTableModel model = (StockTableModel) stockTable.getModel();
+        return userToReturn;
+    }// end newUser
 
-        String criteria = "/list";
-       // ArrayList<User> users = Helper.query("Users", criteria, context);
+}// end class
 
 
-       // for(int i=0; i<users.size(); i++) {
-               User nextUser = Users.get(0);
-
-              
-
-                             if (!Helper.insert(newuser, "Users", context)) {
-                                 JOptionPane.showMessageDialog(frame, "insert Users failed!",
-                                    "Users", JOptionPane.ERROR_MESSAGE);
-
-                             }// end if
-
-                                System.out.println(newuser.getId());
-
-                    }// end if
-                }// end for
-
-    
 
 

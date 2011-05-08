@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.util.DateFormatter;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
 
@@ -115,7 +116,7 @@ public class InventoriesTableModel extends AbstractTableModel
             }
             else if(col == 1)
             {
-                valueToReturn = inventory.getUpdateDate().toString();
+                valueToReturn = DateFormatter.toString(inventory.getUpdateDate());
             }
             else if(col == 2)
             {
