@@ -3,7 +3,7 @@
  * @author Brian Gormanly
  * 
  */
-;
+
 package client;
 
 import org.jdesktop.application.Application;
