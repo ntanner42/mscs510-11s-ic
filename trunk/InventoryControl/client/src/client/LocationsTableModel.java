@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Location;
+import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
 
 /**
  *
- * @author SandeepMJ
+ * @author Harish Giriraju
  */
 public class LocationsTableModel extends AbstractTableModel {
     
@@ -27,8 +28,6 @@ public class LocationsTableModel extends AbstractTableModel {
     private static String[] columnNames = {
         "Id",
         "Name",
-        "Address",
-        "State"
     };
 
     @Override
@@ -37,8 +36,7 @@ public class LocationsTableModel extends AbstractTableModel {
     }
 
 
-    public int getRowCount()
-    {
+    public int getRowCount(){
         return locations.size();
     }
 
@@ -48,14 +46,10 @@ public class LocationsTableModel extends AbstractTableModel {
 
      @Override
     public boolean isCellEditable(int row, int col) {
-        if(col == 2)
-            return true;
-        if(col == 3)
-            return true;
-        if(col == 4)
-            return true;
+        if(col == 1)
+            return true;      
 
-        return false;
+            return false;
     }
 
 
@@ -75,7 +69,7 @@ public class LocationsTableModel extends AbstractTableModel {
                 if(dirty.get(id) != null)
                 {
                     indicator = "* ";
-        }
+                }
 
                 valueToReturn = id + indicator;
             }
@@ -87,14 +81,7 @@ public class LocationsTableModel extends AbstractTableModel {
             {
                 valueToReturn = location.getName();
             }
-            else if(col == 2)
-            {
-                valueToReturn = "3399 North Road";
-            }
-            else 
-            {
-                valueToReturn = "NY";
-            }
+            
         }
         catch (Exception e) {
             System.out.println("Incorrect Type..");
@@ -104,7 +91,27 @@ public class LocationsTableModel extends AbstractTableModel {
         return valueToReturn;
 
     }
-    
+
+     /**
+     * Get a locations by row;
+     * @param row Row
+     * @return locations
+     */
+    public Location getRow(int row) {
+
+        if(row < 0 || row >= locations.size())
+            return null;
+
+        return locations.get(row);
+    }
+
+    /**
+     * Removes a locations from the table
+     */
+    public void remove(int row) {
+        // .remove(row);
+    }
+
     @Override
     public void setValueAt(Object value, int row, int col)
     {
@@ -120,6 +127,7 @@ public class LocationsTableModel extends AbstractTableModel {
         this.fireTableDataChanged();
     }
     
+    //Function to add a row
     public boolean add(Location locationToAdd)
     {
         WorkletContext context = WorkletContext.getInstance();
@@ -127,6 +135,7 @@ public class LocationsTableModel extends AbstractTableModel {
         return Helper.insert(locationToAdd, "Location",context);
     }
 
+    //Function to delete a row
     public boolean delete(int row)
     {
         WorkletContext context = WorkletContext.getInstance();
@@ -136,54 +145,40 @@ public class LocationsTableModel extends AbstractTableModel {
         return Helper.delete(locationToDelete, "Locactions", context);
     }
 
-   /**
-     * Get a location by row;
-     * @param row Row
-     * @return Location
+/**
+     * Refreshes the table of Locations;
      */
-    //public Location getRow(int row) {
-        //if(row < 0 || row >= .size())
-            //return null;
-
-        //return .get(row);
-    //}
-
-    /**
-     * Removes a location from the table
-     */
-    public void remove(int row) {
-        // .remove(row);
-    }
-
-    /**
-     * Refreshes the table of location;
-     
-    public void refresh() {
-
-        this.fireTableDataChanged();
-    }
-     * */
     
     public void refresh()
     {
         WorkletContext context = WorkletContext.getInstance();
 
-        locations = Helper.query("Locations", "/list", context);
+           try
+           {
+               NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
 
-        dirty.clear();
+                    if(!Helper.login("admin","gaze11e",context))
+                        throw new Exception("login failed");
 
-        this.fireTableDataChanged();
+                String criteria = "/list";
+
+
+                locations = Helper.query("Locations", criteria, context);
+
+                dirty.clear();
+                this.fireTableDataChanged();
+
+        }
+         catch(Exception ex){
+             
+         }
+
     }
-    
-    public Location getRow(int row)
-    {
-        return locations.get(row);
-    }
 
-    public HashMap<Integer,Location> getDirty()
-    {
+
+
+    public HashMap<Integer,Location> getDirty() {
         return dirty;
     }
-
 
 }

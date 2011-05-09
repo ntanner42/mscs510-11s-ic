@@ -723,7 +723,7 @@ public class ItemDialog extends javax.swing.JDialog {
     private void saveStock(Inventory inventory,Item item){
 
         final ItemDialog frame = this;
-        WorkletContext context = WorkletContext.getInstance();
+        //WorkletContext context = WorkletContext.getInstance();
 
         StockTableModel model = (StockTableModel) stockTable.getModel();
         final HashMap<Integer, Stock> dirty = model.getDirty();
@@ -766,16 +766,199 @@ public class ItemDialog extends javax.swing.JDialog {
 
     }// end saveStock
 
+    private void refreshBasicItemInformation(){
 
+        final ItemDialog frame = this;
+
+        Item item = currentItem.get(0);
+        Inventory inventory = currentInventory.get(0);
+        boolean isBasicItemInformationChanged = false;
+
+
+        if (!(this.itemNameTextField.getText().toString().equals(item.getName().toString())))
+        {
+            isBasicItemInformationChanged = true;
+        }
+        if (!(this.itemDescriptionTextField.getText().toString().equals(item.getDescription().toString())))
+        {
+            isBasicItemInformationChanged = true;
+        }
+        if (!(this.itemModelTextField.getText().toString().equals(item.getModelNumber().toString())))
+        {
+            isBasicItemInformationChanged = true;
+        }
+        if (!(this.itemReOrderThresholdTextField.getText().toString().equals(item.getStockThreshold().toString())))
+        {
+            isBasicItemInformationChanged = true;
+        }
+        if (!(this.itemOEMTextField.getText().toString().equals(item.getOem().toString())))
+        {
+            isBasicItemInformationChanged = true;
+        }
+
+        if(isBasicItemInformationChanged)
+        {
+            String msg = "Some item details have changed.";
+            msg += "\nSave them?";
+
+            int n = JOptionPane.showConfirmDialog(
+                    frame,
+                    msg,
+                    "Confirm",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (n == 1) {
+                
+                initBasicItemInformation(item);
+                return;
+            }
+
+            saveBasicItemInformation();
+
+        }
+}
+
+    private void saveBasicItemInformation(){
+
+        final ItemDialog frame = this;
+
+        Item item = currentItem.get(0);
+        Inventory inventory = currentInventory.get(0);
+
+        String itemName = itemNameTextField.getText().toString();
+        String itemDescription = itemDescriptionTextField.getText().toString();
+        String itemOem = itemOEMTextField.getText().toString();
+        String itemModel = itemModelTextField.getText().toString();
+        String itemReOrderThreshold = itemReOrderThresholdTextField.getText().toString();
+
+        Integer reOrderThreshold = 0;
+
+        try{
+                reOrderThreshold = Integer.parseInt(itemReOrderThreshold);
+        }catch(Exception ex1){
+
+            String errorMessage = "Re-order threshold must be an integer";
+            JOptionPane.showMessageDialog(this,errorMessage,
+                                    "Required parameters missing",
+                                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Item newItem = item;
+        newItem.setName(itemName);
+        newItem.setDescription(itemDescription);
+        newItem.setModelNumber(itemModel);
+        newItem.setOem(itemOem);
+        newItem.setStockThreshold(reOrderThreshold);
+
+        inventory.insert(item);
+
+        System.out.println(item.getId());
+
+        if (!Helper.insert(item, "Inventories", context)) {
+            System.out.println("insert Item into Inventory failed!");
+        }
+
+        System.out.println(item.getId());
+ 
+    }
+
+    private void validateBasicItemInformation(){
+
+        Item item = currentItem.get(0);
+        Inventory inventory = currentInventory.get(0);
+
+        String errorMessage = "";
+
+        String itemName = itemNameTextField.getText().toString();
+        String itemDescription = itemDescriptionTextField.getText().toString();
+        String itemOem = itemOEMTextField.getText().toString();
+        String itemModel = itemModelTextField.getText().toString();
+        String itemReOrderThreshold = itemReOrderThresholdTextField.getText().toString();
+        Integer stockReOrderThreshold = 0;
+
+        if(itemName.equals("")  || itemName.isEmpty())
+        {
+            errorMessage += "Please enter a item name\n";
+
+        }
+
+        if ((itemDescription.equals("")) || itemDescription.isEmpty())
+        {
+            errorMessage += "Please enter a item description\n";
+
+        }
+
+        if(itemOem.equals("") || itemOem.isEmpty())
+        {
+            errorMessage += "Please enter a item oem number\n";
+
+        }
+
+        if (itemModel.equals("") || itemModel.isEmpty())
+        {
+            errorMessage += "Please enter a item model\n";
+
+        }
+        if (itemReOrderThreshold.equals("") || itemReOrderThreshold.isEmpty())
+        {
+            errorMessage += "Please enter a item re-order threshold\n";
+
+        }
+        else
+        {
+            try
+            {
+                stockReOrderThreshold = Integer.parseInt(itemReOrderThreshold.toString());
+                if (stockReOrderThreshold < 0)
+                {
+                   errorMessage += "Re-order Threshold must be a positive integer\n";
+                }
+            }catch(Exception ex){
+
+                errorMessage += "Re-order Threshold must be an integer\n";
+            }
+        }
+
+
+        if(errorMessage.length() > 0) {
+
+            JOptionPane.showMessageDialog(this,errorMessage,
+                                        "Required parameters missing",
+                                        JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+
+    }
   
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         // TODO add refresh button handling code here:
+       final ItemDialog frame = this;
        SwingUtilities.invokeLater(new Runnable() {
 
            public void run() {
 
-                refreshStock();
+                int selectedTab = frame.itemTabbedPane.getSelectedIndex();
+                switch(selectedTab)
+                {
+                    case 0: validateBasicItemInformation();
+                            refreshBasicItemInformation();
+                            break;
 
+                    case 1: refreshStock();
+                            break;
+                    case 2:
+                            //validateBasicItemInformation();
+                            break;
+                    case 3: 
+                            //refreshStock();
+                            break;
+
+                    default:
+                             break;
+                          
+                }
 
              }// end run
 
@@ -791,10 +974,13 @@ public class ItemDialog extends javax.swing.JDialog {
 
            public void run() {
 
-                 Item item = currentItem.get(0);
-                 Inventory inventory = currentInventory.get(0);
+               Item item = currentItem.get(0);
+               Inventory inventory = currentInventory.get(0);
 
-                saveStock(inventory,item);
+               validateBasicItemInformation();
+               saveBasicItemInformation();
+
+               saveStock(inventory,item);
 
 
              }// end run
@@ -802,7 +988,7 @@ public class ItemDialog extends javax.swing.JDialog {
         });// end swing utilities
 
 
-         dispose();
+        dispose();
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
@@ -812,7 +998,10 @@ public class ItemDialog extends javax.swing.JDialog {
 
            public void run() {
 
-                refreshStock();
+               validateBasicItemInformation();
+               refreshBasicItemInformation();
+
+               refreshStock();
 
 
              }// end run
@@ -955,26 +1144,26 @@ public class ItemDialog extends javax.swing.JDialog {
 
                 try {
 
-//                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
-//
-//                        if(!Helper.login("admin","gaze11e",context))
-//                            throw new Exception("login failed");
-//
-//                    String criteria1 = "/list[1]";
-//                    //Issuing the query using the helper to the Inventories repository
-//                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
-//                    if (inventories == null) {
-//                        throw new Exception("bad query");
-//                    }
-//
-//                    Inventory inventory = inventories.get(0);
-//
-//                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
-//                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
-//
-//                    Item item = items.get(0);
+                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+
+                        if(!Helper.login("admin","gaze11e",context))
+                            throw new Exception("login failed");
+
+                    String criteria1 = "/list[1]";
+                    //Issuing the query using the helper to the Inventories repository
+                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
+                    if (inventories == null) {
+                        throw new Exception("bad query");
+                    }
+
+                    Inventory inventory = inventories.get(0);
+
+                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
+
+                    Item item = items.get(0);
            
-                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
+                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
                     dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

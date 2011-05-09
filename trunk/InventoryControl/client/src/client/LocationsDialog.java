@@ -13,14 +13,18 @@ package client;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
+import org.workplicity.inventorycontrol.entry.Location;
+import org.workplicity.util.Helper;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
- * @author SandeepMJ
+ * @author Harish Giriraju
  */
 public class LocationsDialog extends javax.swing.JDialog {
 
@@ -34,16 +38,15 @@ public class LocationsDialog extends javax.swing.JDialog {
         initLocationsTable();
     }
 
+
     private void initLocationsTable() {
         // Fix the column widths
         locationsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         final int[] WIDTHS = {
              40,  // Id
-            110,  // Name
-            150,  // Address
-             77   // State
-
+            150,  // Name
+           
         };
 
         for(int i=0; i < WIDTHS.length; i++) {
@@ -64,6 +67,7 @@ public class LocationsDialog extends javax.swing.JDialog {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                            // call method to perform task on double click
+                              editLocationRequest(row);
                         }
                     });
                 }
@@ -74,6 +78,73 @@ public class LocationsDialog extends javax.swing.JDialog {
 
         model.refresh();
     }
+
+     private Location editLocationRequest(int row) {
+        LocationsTableModel locationModel = (LocationsTableModel) locationsTable.getModel();
+
+        Location selectedLocation = locationModel.getRow(row);
+
+        return selectedLocation;
+        
+    }
+
+    // Refresh Mehtod
+     private void refreshLocations(){
+
+            final LocationsDialog frame = this;
+            
+            LocationsTableModel model = (LocationsTableModel) locationsTable.getModel();
+
+            final HashMap<Integer, Location> dirty = model.getDirty();
+
+            if (model.getDirty().isEmpty()) {
+                model.refresh();
+                return;
+            }
+
+            String msg = "Some Locations have changed.";
+            msg += "\nSave them?";
+
+            int n = JOptionPane.showConfirmDialog(
+                    frame,
+                    msg,
+                    "Confirm",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (n == 1) {
+                model.refresh();
+                return;
+            }
+
+            saveLocations();
+                
+    }// end refresh locations
+
+     //Save method
+     private void saveLocations(){
+
+            final LocationsDialog frame = this;
+            WorkletContext context = WorkletContext.getInstance();
+
+            LocationsTableModel model = (LocationsTableModel) locationsTable.getModel();
+            final HashMap<Integer, Location> dirty = model.getDirty();
+
+
+            for(Integer id : dirty.keySet()) {
+                 Location location = dirty.get(id);
+
+
+                if (!Helper.insert(location, "Locations", context)) {
+                System.out.print("insert failed!");
+                }
+
+            }// end for
+
+            model.refresh();
+
+        }// end saveLocation
+
+
 
 
 
@@ -92,6 +163,7 @@ public class LocationsDialog extends javax.swing.JDialog {
         addButton = new javax.swing.JButton();
         deleteButton = new javax.swing.JButton();
         doneButton = new javax.swing.JButton();
+        editLocationButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -138,6 +210,14 @@ public class LocationsDialog extends javax.swing.JDialog {
             }
         });
 
+        editLocationButton.setIcon(resourceMap.getIcon("editLocationButton.icon")); // NOI18N
+        editLocationButton.setName("editLocationButton"); // NOI18N
+        editLocationButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editLocationButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -145,68 +225,74 @@ public class LocationsDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(refreshButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                        .addComponent(editLocationButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(addButton)
-                        .addGap(53, 53, 53)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(51, 51, 51)
-                        .addComponent(doneButton)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addButton, deleteButton, refreshButton});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addButton, deleteButton, editLocationButton, refreshButton});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(refreshButton)
-                        .addComponent(doneButton))
-                    .addComponent(deleteButton)
-                    .addComponent(addButton))
+                        .addComponent(deleteButton)
+                        .addComponent(addButton))
+                    .addComponent(editLocationButton)
+                    .addComponent(doneButton))
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addButton, deleteButton, refreshButton});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addButton, deleteButton, editLocationButton, refreshButton});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         // TODO add your handling code here:
-          String msg = "Some locatios have changes. Save them?";
+       SwingUtilities.invokeLater(new Runnable() {
 
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+           public void run() {
 
-        if (n == 1) {
-            return;
+                refreshLocations();
 
-        }
-       
+             }// end run
+
+        });// end swing utilities
     }//GEN-LAST:event_refreshButtonActionPerformed
 
+    // Addbutton code 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         // TODO add your handling code here:
         final LocationsDialog dialog = this;
+        refreshLocations();
         SwingUtilities.invokeLater(new Runnable() {
+        
             @Override
             public void run() {
                 try {
+                    
+                    Location location = new Location();
                     AddLocationDialog locationDialog =
-                            new AddLocationDialog( null , true);
-
+                    new AddLocationDialog( null ,location, true);
                     locationDialog.setVisible(true);
+                    locationDialog.setTitle("Add New Locations");
+
+                    refreshLocations();
 
                 } catch (Exception e) {
                     //Logger.log(e.toString());
@@ -215,37 +301,109 @@ public class LocationsDialog extends javax.swing.JDialog {
         });
     }//GEN-LAST:event_addButtonActionPerformed
 
+    // Delete button code
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
         // TODO add your handling code here:
-         String msg = "Are sure to delete this Training?";
+        final LocationsDialog frame = this;
 
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                LocationsTableModel model = (LocationsTableModel) locationsTable.getModel();
+                int row = locationsTable.getSelectedRow();
+                if (row == -1){
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a location from the table to delete ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                 {
+                        Location location = editLocationRequest(row);
+                       // TODO add delete Location handling code here:
+                        String msg = "Are sure to delete this Location?";
 
-        if (n == 1) {
-            return;
-        }
+                        int n = JOptionPane.showConfirmDialog(
+                                null,
+                                msg,
+                                "Confirm",
+                                JOptionPane.YES_NO_OPTION);
+
+                        if (n == 1) {
+                            return;
+                        }
+
+                try{
+                        WorkletContext context = WorkletContext.getInstance();
+                        if (!Helper.delete(location, "Locations", context)) {
+                            System.out.print("Delete failed!");
+                        }
+                        else
+                        {
+                            System.out.print("Delete successful");
+                        }
+
+                }catch(Exception ex){
+
+               }
+              }
+                 refreshLocations();
+                 model.fireTableDataChanged();
+
+                }
+
+          });
+
     }//GEN-LAST:event_deleteButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
         // TODO add your handling code here:
-         String msg = "Some locatios have changes. Save them?";
+       SwingUtilities.invokeLater(new Runnable() {
 
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+           public void run() {
 
-        if (n == 1) {
-            return;
+                refreshLocations();
 
-        }
+             }// end run
+
+        });// end swing utilities
         dispose();
     }//GEN-LAST:event_doneButtonActionPerformed
+
+    private void editLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLocationButtonActionPerformed
+        // TODO add your handling code here:
+        final LocationsDialog frame = this;
+        
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+
+                int row = locationsTable.getSelectedRow();
+                if (row == -1){
+
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a Location from the table to view ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+
+                }
+                else
+                 {
+                        // Displays add Location dialog
+                        Location location = new Location();
+                        location = editLocationRequest(row);
+                        AddLocationDialog locationDialog =
+                                new AddLocationDialog( null ,location, true);
+                        locationDialog.setVisible(true);
+                        locationDialog.setTitle("Edit location");
+
+                        refreshLocations();
+                }
+            }
+        });
+
+    }//GEN-LAST:event_editLocationButtonActionPerformed
 
     /**
     * @param args the command line arguments
@@ -261,8 +419,8 @@ public class LocationsDialog extends javax.swing.JDialog {
                 
                 LocationsDialog dialog = new LocationsDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    System.exit(0);
                     }
                 });
                 dialog.setVisible(true);
@@ -274,6 +432,7 @@ public class LocationsDialog extends javax.swing.JDialog {
     private javax.swing.JButton addButton;
     private javax.swing.JButton deleteButton;
     private javax.swing.JButton doneButton;
+    private javax.swing.JButton editLocationButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable locationsTable;
     private javax.swing.JButton refreshButton;

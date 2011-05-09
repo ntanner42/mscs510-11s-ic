@@ -14,6 +14,7 @@ import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.inventorycontrol.entry.Stock;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
+import org.workplicity.util.DateFormatter;
 
 /**
  *
@@ -73,9 +74,7 @@ public class StockTableModel extends AbstractTableModel {
                         indicator = "* ";
                         return id + indicator;
 
-                case 1:
-                        Date date = stock.getUpdateDate();
-                        return date;
+                case 1: return DateFormatter.toString(stock.getUpdateDate());
 
                 case 2:
                         String assetTag = stock.getAssetTag();
