@@ -64,8 +64,7 @@ public class AddStockDialog extends javax.swing.JDialog {
             rmaNumberTextField.setText(stock.getRmaNumber().toString());
         }
         if (! (stock.getSerialNumber() == null)){
-            serialNumberTextField.setText(stock.getRmaNumber().toString());
-
+            serialNumberTextField.setText(stock.getSerialNumber().toString());
         }
 
     }
@@ -226,34 +225,38 @@ public class AddStockDialog extends javax.swing.JDialog {
         Stock newStock = currentStock.get(0);
         Item item = currentItem.get(0);
         Inventory inventory = currentInventory.get(0);
+       
+        String errorMessage = "";
 
-        if((partNumber.equals("")  || partNumber.equals("Enter the partNumber")) || partNumber.isEmpty())
+        if((partNumber.equals("")  || partNumber.equals("Enter part number")) || partNumber.isEmpty())
         {
-            JOptionPane.showMessageDialog(this,
-                        "Please enter a partNumber ",
-                        "Required parameters missing",
-                        JOptionPane.ERROR_MESSAGE);
+            errorMessage += "Please enter a part number\n";
+           
         }
-        else if ((rmaNumber.equals("")) || rmaNumber.equals("Enter the rma Number") || rmaNumber.isEmpty()){
 
-            JOptionPane.showMessageDialog(this,
-                        "Please enter the rmaNumber",
-                        "Required parameters missing",
-                        JOptionPane.ERROR_MESSAGE);
-        }
-        else if(serialNumber.equals("") || serialNumber.equals("Enter the partNumber") || serialNumber.isEmpty())
+        if ((rmaNumber.equals("")) || rmaNumber.equals("Enter rma number") || rmaNumber.isEmpty())
         {
-            JOptionPane.showMessageDialog(this,
-                        "Please enter a serialNumber ",
-                        "Required parameters missing",
-                        JOptionPane.ERROR_MESSAGE);
+            errorMessage += "Please enter a rma number\n";
+            
         }
-        else if (assetTag.equals("") || assetTag.equals("Enter the rma Number") || assetTag.isEmpty()) {
 
-            JOptionPane.showMessageDialog(this,
-                        "Please enter the assetTag",
-                        "Required parameters missing",
-                        JOptionPane.ERROR_MESSAGE);
+        if(serialNumber.equals("") || serialNumber.equals("Enter serial number") || serialNumber.isEmpty())
+        {
+            errorMessage += "Please enter a serial number\n";
+       
+        }
+
+        if (assetTag.equals("") || assetTag.equals("Enter asset tag") || assetTag.isEmpty())
+        {
+            errorMessage += "Please enter a asset tag\n";
+            
+        }
+
+        if(errorMessage.length() > 0) {
+
+            JOptionPane.showMessageDialog(this,errorMessage,
+                                        "Required parameters missing",
+                                        JOptionPane.ERROR_MESSAGE);
         }
         else
         {
