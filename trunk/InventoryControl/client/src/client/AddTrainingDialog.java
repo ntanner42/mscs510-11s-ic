@@ -11,10 +11,17 @@
 
 package client;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.workplicity.elog.entry.ElogUser;
+import org.workplicity.entry.User;
+import org.workplicity.inventorycontrol.entry.Training;
+import org.workplicity.util.DateFormatter;
 import org.workplicity.util.Helper;
 import org.workplicity.util.WorkDate;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
@@ -22,15 +29,77 @@ import org.workplicity.util.WorkDate;
  */
 public class AddTrainingDialog extends javax.swing.JDialog {
 
+    private ArrayList<Training> currentTraining = new ArrayList<Training>( );
+    private ArrayList<ElogUser> users = new ArrayList<ElogUser>( );
     /** Creates new form AddTrainingDialog */
-    public AddTrainingDialog(java.awt.Frame parent, boolean modal) {
+    public AddTrainingDialog(java.awt.Frame parent, Training training, boolean modal) {
         super(parent, modal);
-        initComponents();
 
-        // displays the dialog to the center of the screen
+        initComponents();
+         try {
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+
+            }
         this.setLocationRelativeTo(null);
-        // sets the title of dialog
-        this.setTitle("Add training");
+
+        currentTraining.add(training);
+
+        // custom initialization for add stock.
+        init(training);
+             
+    }
+
+    private void init(Training training){
+
+        initUserComboBox();
+
+
+        if (!( training.getDate() == null)){
+
+            String trainingDate = DateFormatter.toString(training.getDate());
+            trainingDateTextField.setText(trainingDate);
+        }
+        else
+        {
+            Calendar calendar = Calendar.getInstance();
+
+            String trainingDate =DateFormatter.toString(calendar.getTime());
+
+            trainingDateTextField.setText(trainingDate);
+
+        }
+
+        if (!( training.getModelId() == null)){
+            modelIdTextField.setText(training.getModelId().toString());
+        }
+        if (! (training.getStatus() == null)){
+            statusComboBox.setSelectedItem(training.getStatus().toString());
+        }
+        if (! (training.getUserId() == null)){
+            userComboBox.setSelectedItem(training.getUserId().toString());
+        }
+        if (!( training.getTrainer() == null)){
+            trainerTextField.setText(training.getTrainer().toString());
+        }
+
+    }
+
+    private void initUserComboBox()
+    {
+        Training training = currentTraining.get(0);
+
+        WorkletContext context = WorkletContext.getInstance();
+
+        String criteria = "/list";
+
+        users = Helper.query("Accounts", criteria, context);
+
+        for(int i= 0; i < users.size();i++)
+        {
+            User user = users.get(i);
+            userComboBox.addItem(user.getId());
+        }
     }
 
     /** This method is called from within the constructor to
@@ -54,11 +123,12 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         jLabel6 = new javax.swing.JLabel();
         statusComboBox = new javax.swing.JComboBox();
         calendarButton = new javax.swing.JButton();
-        trainerComboBox = new javax.swing.JComboBox();
+        trainerTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
+        trainingDateTextField.setEditable(false);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(client.MainFrame.class).getContext().getResourceMap(AddTrainingDialog.class);
         trainingDateTextField.setText(resourceMap.getString("trainingDateTextField.text")); // NOI18N
         trainingDateTextField.setName("trainingDateTextField"); // NOI18N
@@ -99,13 +169,12 @@ public class AddTrainingDialog extends javax.swing.JDialog {
             }
         });
 
-        userComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
         userComboBox.setName("userComboBox"); // NOI18N
 
         jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
         jLabel6.setName("jLabel6"); // NOI18N
 
-        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Repair", "Working", " " }));
+        statusComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "PENDING", "ONGOING", "COMPLETE" }));
         statusComboBox.setName("statusComboBox"); // NOI18N
 
         calendarButton.setIcon(resourceMap.getIcon("calendarButton.icon")); // NOI18N
@@ -117,8 +186,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
             }
         });
 
-        trainerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", " " }));
-        trainerComboBox.setName("trainerComboBox"); // NOI18N
+        trainerTextField.setText(resourceMap.getString("trainerTextField.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -138,13 +206,15 @@ public class AddTrainingDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(userComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(modelIdTextField, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(trainingDateTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(trainingDateTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(userComboBox, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(calendarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(statusComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(trainerComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(trainerTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(statusComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 141, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(saveButton)
@@ -178,7 +248,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(trainerComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(trainerTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
@@ -195,9 +265,107 @@ public class AddTrainingDialog extends javax.swing.JDialog {
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add your handling code here:
-         dispose();
+
+        String trainingDate = trainingDateTextField.getText().toString();
+        String modelID = modelIdTextField.getText().toString();
+        String userID = userComboBox.getSelectedItem().toString();
+        String status = statusComboBox.getSelectedItem().toString();
+        String trainer = trainerTextField.getText().toString();
+
+        Integer convertedModelID = 0;
+
+        Training newTraining = currentTraining.get(0);
+        
+        String errorMessage = "";
+
+        if(trainingDate.equals("")  || trainingDate.isEmpty())
+        {
+            errorMessage += "Please select a training date.\n";
+
+        }
+
+        if ((modelID.equals("")) || modelID.equals("Enter model id") || modelID.isEmpty())
+        {
+            errorMessage += "Please enter model id.\n";
+
+        }
+
+        try{
+            convertedModelID = Integer.parseInt(modelID);
+        }catch(Exception ex){
+            errorMessage += "Model id must be a positive integer value.\n";
+        }
+       
+        if(userID.equals("") || userID.isEmpty())
+        {
+            errorMessage += "Please select a user id.\n";
+
+        }
+
+        if (status.equals("") || status.isEmpty())
+        {
+            errorMessage += "Please select training status.\n";
+
+        }
+
+        if (trainer.equals("") || trainer.equals("Enter trainer name") || trainer.isEmpty())
+        {
+            errorMessage += "Please enter trainer name.\n";
+
+        }
+
+        if(errorMessage.length() > 0) {
+
+            JOptionPane.showMessageDialog(this,errorMessage,
+                                        "Required parameters missing",
+                                        JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            WorkDate date = Helper.toDate(trainingDateTextField.getText());
+            newTraining.setDate(date);
+
+            newTraining.setModelId(convertedModelID);
+
+            if(status.equals("PENDING")){
+               newTraining.setStatus(Training.Status.PENDING);
+            }
+            else if(status.equals("ONGOING")){
+               newTraining.setStatus(Training.Status.ONGOING);
+            }
+            else if(status.equals("COMPLETE")){
+               newTraining.setStatus(Training.Status.COMPLETE);
+            }
+            
+            newTraining.setTrainer(trainer);
+            newTraining.setUserId(Integer.parseInt(userID));
+
+            insertTraining(newTraining);
+
+
+            dispose();
+        }
     }//GEN-LAST:event_saveButtonActionPerformed
 
+    private void insertTraining(Training training){
+
+        final AddTrainingDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+        
+
+         System.out.println(training.getId());
+        
+         if (!Helper.insert(training, "Trainings", context)) {
+             JOptionPane.showMessageDialog(frame, "insert training into Trainings failed!",
+                "Trainings", JOptionPane.ERROR_MESSAGE);
+
+             return;
+         }// end if
+
+         System.out.println(training.getId());     
+
+    }
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
          dispose();
@@ -213,6 +381,8 @@ public class AddTrainingDialog extends javax.swing.JDialog {
 
                 // displays the calendar dialog
                 CalendarDialog calendar = new CalendarDialog(dialog,date);
+
+
 
                 calendar.setVisible(true);
                 if(calendar.getCalendar() == null)
@@ -238,13 +408,8 @@ public class AddTrainingDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                // Attempt to set the appearance to the system default
-                try {
-                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-
-                }
-                AddTrainingDialog dialog = new AddTrainingDialog(new javax.swing.JFrame(), true);
+                
+                AddTrainingDialog dialog = new AddTrainingDialog(new javax.swing.JFrame(),null, true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -267,7 +432,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
     private javax.swing.JTextField modelIdTextField;
     private javax.swing.JButton saveButton;
     private javax.swing.JComboBox statusComboBox;
-    private javax.swing.JComboBox trainerComboBox;
+    private javax.swing.JTextField trainerTextField;
     private javax.swing.JTextField trainingDateTextField;
     private javax.swing.JComboBox userComboBox;
     // End of variables declaration//GEN-END:variables
