@@ -298,8 +298,10 @@ public class AddStockDialog extends javax.swing.JDialog {
                              System.out.println(newStock.getId());
 
                              if (!Helper.insert(newStock, "Inventories", context)) {
+
                                  JOptionPane.showMessageDialog(frame, "insert Item into Inventory failed!",
                                     "Stocks", JOptionPane.ERROR_MESSAGE);
+                                 return;
 
                              }// end if
 

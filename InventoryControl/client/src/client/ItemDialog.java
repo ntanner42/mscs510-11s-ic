@@ -15,16 +15,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.JDialog;
-import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
-import org.workplicity.entry.Entry;
 import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.inventorycontrol.entry.Stock;
+import org.workplicity.inventorycontrol.entry.Training;
 import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
@@ -132,7 +130,7 @@ public class ItemDialog extends javax.swing.JDialog {
         model.refresh(inventory,item);
     }
 
-        private Stock editStockRequest(int row) {
+    private Stock editStockRequest(int row) {
         StockTableModel stockModel = (StockTableModel) stockTable.getModel();
 
         Stock selectedStock = stockModel.getRow(row);
@@ -149,11 +147,13 @@ public class ItemDialog extends javax.swing.JDialog {
         trainingTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         final int[] WIDTHS = {
+
+             40,   // Training Id
              80,   // Training Date
-             60,   // Model id
-             75,   // User
-             85,   // Status
-             73,   // Trainer
+             55,   // Model id
+             40,   // User
+             70,   // Status
+             87    // Trainer
 
         };
 
@@ -175,16 +175,25 @@ public class ItemDialog extends javax.swing.JDialog {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                            // call method to perform task on double click
+                            editTrainingRequest(row);
                         }
                     });
                 }
             }
         });
 
-        //TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
-        //model.refresh();
+        TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
+        model.refresh();
     }
 
+    private Training editTrainingRequest(int row) {
+        TrainingTableModel trainingModel = (TrainingTableModel) trainingTable.getModel();
+
+        Training selectedTraining = trainingModel.getRow(row);
+
+        return selectedTraining;
+       
+    }
 
     /**
      * Initializes the Ordering table.
@@ -261,11 +270,13 @@ public class ItemDialog extends javax.swing.JDialog {
         trainingTable = new javax.swing.JTable();
         deleteTrainingButton = new javax.swing.JButton();
         addTrainingButton = new javax.swing.JButton();
+        drillDownTrainingButton = new javax.swing.JButton();
         orderingPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         ordersTable = new javax.swing.JTable();
         deleteOrderButton = new javax.swing.JButton();
         addOrderButton = new javax.swing.JButton();
+        drillDownOrderButton = new javax.swing.JButton();
         doneButton = new javax.swing.JButton();
         refreshButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
@@ -457,6 +468,14 @@ public class ItemDialog extends javax.swing.JDialog {
             }
         });
 
+        drillDownTrainingButton.setIcon(resourceMap.getIcon("drillDownTrainingButton.icon")); // NOI18N
+        drillDownTrainingButton.setName("drillDownTrainingButton"); // NOI18N
+        drillDownTrainingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drillDownTrainingButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout trainingPanelLayout = new javax.swing.GroupLayout(trainingPanel);
         trainingPanel.setLayout(trainingPanelLayout);
         trainingPanelLayout.setHorizontalGroup(
@@ -466,13 +485,15 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addGroup(trainingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, trainingPanelLayout.createSequentialGroup()
+                        .addComponent(drillDownTrainingButton, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(addTrainingButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteTrainingButton)))
                 .addContainerGap())
         );
 
-        trainingPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addTrainingButton, deleteTrainingButton});
+        trainingPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addTrainingButton, deleteTrainingButton, drillDownTrainingButton});
 
         trainingPanelLayout.setVerticalGroup(
             trainingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -480,13 +501,15 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(trainingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(deleteTrainingButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addTrainingButton))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addGroup(trainingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(trainingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(deleteTrainingButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(addTrainingButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(drillDownTrainingButton, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        trainingPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addTrainingButton, deleteTrainingButton});
+        trainingPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addTrainingButton, deleteTrainingButton, drillDownTrainingButton});
 
         itemTabbedPane.addTab(resourceMap.getString("trainingPanel.TabConstraints.tabTitle"), trainingPanel); // NOI18N
 
@@ -516,6 +539,14 @@ public class ItemDialog extends javax.swing.JDialog {
             }
         });
 
+        drillDownOrderButton.setIcon(resourceMap.getIcon("drillDownOrderButton.icon")); // NOI18N
+        drillDownOrderButton.setName("drillDownOrderButton"); // NOI18N
+        drillDownOrderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                drillDownOrderButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout orderingPanelLayout = new javax.swing.GroupLayout(orderingPanel);
         orderingPanel.setLayout(orderingPanelLayout);
         orderingPanelLayout.setHorizontalGroup(
@@ -525,13 +556,15 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addGroup(orderingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, orderingPanelLayout.createSequentialGroup()
+                        .addComponent(drillDownOrderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(addOrderButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteOrderButton)))
                 .addContainerGap())
         );
 
-        orderingPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addOrderButton, deleteOrderButton});
+        orderingPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {addOrderButton, deleteOrderButton, drillDownOrderButton});
 
         orderingPanelLayout.setVerticalGroup(
             orderingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -539,13 +572,15 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(orderingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(deleteOrderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addOrderButton))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addGroup(orderingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(orderingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(deleteOrderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(addOrderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(drillDownOrderButton, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        orderingPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addOrderButton, deleteOrderButton});
+        orderingPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {addOrderButton, deleteOrderButton, drillDownOrderButton});
 
         itemTabbedPane.addTab(resourceMap.getString("orderingPanel.TabConstraints.tabTitle"), orderingPanel); // NOI18N
 
@@ -578,7 +613,7 @@ public class ItemDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(refreshButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
@@ -588,17 +623,22 @@ public class ItemDialog extends javax.swing.JDialog {
                 .addContainerGap())
             .addComponent(itemTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {doneButton, saveButton});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(itemTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(doneButton)
-                    .addComponent(refreshButton)
-                    .addComponent(saveButton))
+                    .addComponent(doneButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(21, 21, 21))
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {doneButton, saveButton});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -863,7 +903,7 @@ public class ItemDialog extends javax.swing.JDialog {
  
     }
 
-    private void validateBasicItemInformation(){
+    private boolean validateBasicItemInformation(){
 
         Item item = currentItem.get(0);
         Inventory inventory = currentInventory.get(0);
@@ -926,10 +966,73 @@ public class ItemDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this,errorMessage,
                                         "Required parameters missing",
                                         JOptionPane.ERROR_MESSAGE);
+            
+            return false ;
+        }
+
+        return true;
+
+    }
+
+    private void refreshTraining()
+    {
+        final ItemDialog frame = this;
+
+
+        TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
+
+        final HashMap<Integer, Training> dirty = model.getDirty();
+
+        if (model.getDirty().isEmpty()) {
+            model.refresh();
             return;
         }
-        
 
+        String msg = "Some trainings have changed.";
+        msg += "\nSave them?";
+
+        int n = JOptionPane.showConfirmDialog(
+                frame,
+                msg,
+                "Confirm",
+                JOptionPane.YES_NO_OPTION);
+
+        if (n == 1) {
+            model.refresh();
+            return;
+        }
+
+        saveTraining();
+
+    }
+
+    private void saveTraining()
+    {
+        final ItemDialog frame = this;
+        //WorkletContext context = WorkletContext.getInstance();
+
+        TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
+        final HashMap<Integer, Training> dirty = model.getDirty();
+
+        for(Integer id : dirty.keySet()) {
+
+            Training changedTraining = dirty.get(id);
+
+            System.out.println(changedTraining.getId());
+
+            if (!Helper.insert(changedTraining, "Trainings", context)) {
+                    JOptionPane.showMessageDialog(frame, "insert Training into Trainings failed!",
+                    "Trainings", JOptionPane.ERROR_MESSAGE);
+                    return;
+            }
+
+            System.out.println(changedTraining.getId());
+
+        }// end foreach
+ 
+        model.refresh();
+
+        
     }
   
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
@@ -942,17 +1045,20 @@ public class ItemDialog extends javax.swing.JDialog {
                 int selectedTab = frame.itemTabbedPane.getSelectedIndex();
                 switch(selectedTab)
                 {
-                    case 0: validateBasicItemInformation();
-                            refreshBasicItemInformation();
-                            break;
+                    case 0:  boolean isItemValid = validateBasicItemInformation();
+                             if(isItemValid)
+                             {
+                                   refreshBasicItemInformation();
+                             }
+                             break;
 
                     case 1: refreshStock();
                             break;
                     case 2:
-                            //validateBasicItemInformation();
+                            refreshTraining();
                             break;
                     case 3: 
-                            //refreshStock();
+                            //refreshOrders();
                             break;
 
                     default:
@@ -977,10 +1083,17 @@ public class ItemDialog extends javax.swing.JDialog {
                Item item = currentItem.get(0);
                Inventory inventory = currentInventory.get(0);
 
-               validateBasicItemInformation();
-               saveBasicItemInformation();
+               boolean isItemValid = validateBasicItemInformation();
+               if(isItemValid)
+               {
+                   saveBasicItemInformation();
 
-               saveStock(inventory,item);
+                   saveStock(inventory,item);
+
+                   saveTraining();
+
+                   dispose();
+               }        
 
 
              }// end run
@@ -988,7 +1101,7 @@ public class ItemDialog extends javax.swing.JDialog {
         });// end swing utilities
 
 
-        dispose();
+        
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
@@ -998,17 +1111,25 @@ public class ItemDialog extends javax.swing.JDialog {
 
            public void run() {
 
-               validateBasicItemInformation();
-               refreshBasicItemInformation();
+               boolean isItemValid = validateBasicItemInformation();
+               if(isItemValid)
+               {
+                   refreshBasicItemInformation();
 
-               refreshStock();
+                   refreshStock();
 
+                   refreshTraining();
+
+                   dispose();
+               }
+               
+              
 
              }// end run
 
         });// end swing utilities
 
-        dispose();
+        
     }//GEN-LAST:event_doneButtonActionPerformed
 
     private void addStockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStockButtonActionPerformed
@@ -1038,39 +1159,83 @@ public class ItemDialog extends javax.swing.JDialog {
     private void addTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrainingButtonActionPerformed
         
         final ItemDialog dialog = this;
+        final Training training = new Training();
+
+        refreshTraining();
+        
         SwingUtilities.invokeLater(new Runnable() {
-            @Override
             public void run() {
-                try {
+                              
                     // Displays add training dialog
                     AddTrainingDialog trainingDialog =
-                            new AddTrainingDialog( null , true);
+                            new AddTrainingDialog( null ,training, true);
 
                     trainingDialog.setVisible(true);
+                    trainingDialog.setTitle("Add new Training");
 
-                } catch (Exception e) {
-                    //Logger.log(e.toString());
-                }
+                    refreshTraining();
+
             }
         });
     }//GEN-LAST:event_addTrainingButtonActionPerformed
 
     private void deleteTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTrainingButtonActionPerformed
         // TODO add delete training button handling code here:
-        TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
-        String msg = "Are sure to delete this Training?";
+        
+        final ItemDialog frame = this;
 
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
+                int row = trainingTable.getSelectedRow();
+                if (row == -1){
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a location from the table to delete ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                 {
+                        Training training = editTrainingRequest(row);
+                       // TODO add delete Location handling code here:
+                        
+                        String msg = "Are sure to delete this training?";
 
-        if (n == 1) {
-            return;
+                        int n = JOptionPane.showConfirmDialog(
+                                null,
+                                msg,
+                                "Confirm",
+                                JOptionPane.YES_NO_OPTION);
 
-        }
-        model.fireTableDataChanged();
+                        if (n == 1) {
+                            return;
+                        }
+
+                        try
+                        {
+
+                            refreshTraining();
+                           
+                            if (!Helper.delete(training, "Trainings", context)) {
+                                System.out.print("Delete failed!");
+                            }
+                            else
+                            {
+                                System.out.print("Delete successful");
+                            }
+
+                }catch(Exception ex){
+
+               }
+              }
+                 refreshTraining();
+                 model.fireTableDataChanged();
+
+                }
+
+          });
     }//GEN-LAST:event_deleteTrainingButtonActionPerformed
 
     private void addOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addOrderButtonActionPerformed
@@ -1135,6 +1300,48 @@ public class ItemDialog extends javax.swing.JDialog {
         
     }//GEN-LAST:event_editButtonActionPerformed
 
+    private void drillDownTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownTrainingButtonActionPerformed
+        // TODO add your handling code here:
+        final ItemDialog frame = this;
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+
+            public void run() {
+
+                int row = trainingTable.getSelectedRow();
+                if (row == -1){
+
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select a training from the table to view ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+
+                }
+                else
+                 {
+                        // Displays add stock dialog
+                        Training training = new Training();
+                        training = editTrainingRequest(row);
+
+                        refreshTraining();
+
+                        AddTrainingDialog stockDialog =
+                                new AddTrainingDialog( null , training, true);
+                        stockDialog.setVisible(true);
+                        stockDialog.setTitle("Edit training");
+
+                        refreshTraining();
+                }
+            }
+        });
+
+    }//GEN-LAST:event_drillDownTrainingButtonActionPerformed
+
+    private void drillDownOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownOrderButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_drillDownOrderButtonActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -1187,6 +1394,8 @@ public class ItemDialog extends javax.swing.JDialog {
     private javax.swing.JButton deleteStockButton;
     private javax.swing.JButton deleteTrainingButton;
     private javax.swing.JButton doneButton;
+    private javax.swing.JButton drillDownOrderButton;
+    private javax.swing.JButton drillDownTrainingButton;
     private javax.swing.JButton editButton;
     private javax.swing.JTextField itemDescriptionTextField;
     private javax.swing.JTextField itemModelTextField;

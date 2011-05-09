@@ -2,8 +2,10 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/ItemDialog.java</file>
         <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/AddStockDialog.java</file>
-        <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/StockTableModel.java</file>
+        <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/TrainingTableModel.java</file>
+        <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/ItemDialog.java</file>
+        <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/AddTrainingDialog.java</file>
+        <file>file:/C:/Users/SandeepMJ/Documents/Inventory%20Control/Project%20checkout/client/src/client/UsersTableModel.java</file>
     </open-files>
 </project-private>
