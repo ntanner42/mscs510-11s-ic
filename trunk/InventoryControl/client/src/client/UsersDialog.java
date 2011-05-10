@@ -11,10 +11,14 @@
 
 package client;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -47,6 +51,22 @@ public class UsersDialog extends javax.swing.JDialog
     // --Code for setting look&feel and centering to Users dialog
     private void init()
     {
+        // Get the screen size object
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension screenSize = tk.getScreenSize();
+
+        // Get the size of the screen
+        int screenHeight = screenSize.height;
+        int screenWidth = screenSize.width;
+
+        // Get the size of the current window
+        int windowHeight = this.getHeight();
+        int windowWidth = this.getWidth();
+
+        int newX = (screenWidth / 2) - (windowWidth / 2);
+        int newY = (screenHeight / 2) - (windowHeight / 2);
+        this.setLocation(newX, newY);
+
         this.setTitle("Users");
         this.setLocationRelativeTo(null);
 
@@ -67,13 +87,14 @@ public class UsersDialog extends javax.swing.JDialog
 
         final int[] WIDTHS = {
             42,     // User ID
-            80,    // Updated
+            80,     // Updated
+            80,     // Type
             80,     // Username
             80,     // Password
             80,     // First name
             80,     // Last name
             80,     // Phone #
-            110      // E-mail address
+            112      // E-mail address
         };
 
         for(int i = 0 ; i<WIDTHS.length; i++)
@@ -82,6 +103,19 @@ public class UsersDialog extends javax.swing.JDialog
             col.setPreferredWidth(WIDTHS[i]);
 
         }
+
+        TableColumn typeColumn = usersTable.getColumnModel().getColumn(2);
+
+        JComboBox typeComboBox = new JComboBox();
+        typeComboBox.addItem(ElogUser.Type.ADMIN);
+        typeComboBox.addItem(ElogUser.Type.NA);
+        typeComboBox.addItem(ElogUser.Type.REQUESTOR);
+        typeComboBox.addItem(ElogUser.Type.SUPERVISOR);
+        typeComboBox.addItem(ElogUser.Type.VIEWER);
+        typeComboBox.addItem(ElogUser.Type.WORKER);
+
+        typeColumn.setCellEditor(new DefaultCellEditor(typeComboBox));
+        
         usersTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -170,10 +204,10 @@ public class UsersDialog extends javax.swing.JDialog
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 718, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(refreshButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 396, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 478, Short.MAX_VALUE)
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(deleteButton)
@@ -200,18 +234,13 @@ public class UsersDialog extends javax.swing.JDialog
     }// </editor-fold>//GEN-END:initComponents
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-        // TODO add your handling code here:
          SwingUtilities.invokeLater(new Runnable() {
-
-           public void run() {
-
+            public void run()
+            {
                 refreshUser();
-
-
-             }// end run
-
+            }// end run
         });// end swing utilities
-
+        
         dispose();
     }//GEN-LAST:event_doneButtonActionPerformed
 
@@ -393,6 +422,7 @@ public class UsersDialog extends javax.swing.JDialog
                 }
                 UsersDialog dialog = new UsersDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
