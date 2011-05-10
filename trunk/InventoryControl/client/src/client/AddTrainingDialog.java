@@ -36,7 +36,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         super(parent, modal);
 
         initComponents();
-         try {
+        try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
 
@@ -281,7 +281,6 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         if(trainingDate.equals("")  || trainingDate.isEmpty())
         {
             errorMessage += "Please select a training date.\n";
-
         }
 
         if ((modelID.equals("")) || modelID.equals("Enter model id") || modelID.isEmpty())
@@ -341,7 +340,6 @@ public class AddTrainingDialog extends javax.swing.JDialog {
             newTraining.setUserId(Integer.parseInt(userID));
 
             insertTraining(newTraining);
-
 
             dispose();
         }

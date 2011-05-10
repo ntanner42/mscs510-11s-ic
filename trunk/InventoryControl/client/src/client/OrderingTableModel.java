@@ -5,18 +5,30 @@
 
 package client;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
+import org.workplicity.util.DateFormatter;
+import org.workplicity.worklet.WorkletContext;
+import org.workplicity.inventorycontrol.entry.OrderAudit;
+import org.workplicity.util.Helper;
 
 /**
  *
  * @author SandeepMJ
  */
+
 public class OrderingTableModel extends AbstractTableModel {
 
+   ArrayList<OrderAudit> orders = new ArrayList<OrderAudit>();
+   private HashMap<Integer,OrderAudit> dirty = new HashMap<Integer,OrderAudit>( );
+   WorkletContext context = WorkletContext.getInstance();
     /**
      * Names of the columns
      */
     private static String[] columnNames = {
+        "Id",
         "OrderDate",
         "Size",
         "PO#",
@@ -30,7 +42,7 @@ public class OrderingTableModel extends AbstractTableModel {
 
 
     public int getRowCount() {
-        return 1;
+        return orders.size();
     }
 
     public int getColumnCount() {
@@ -48,54 +60,116 @@ public class OrderingTableModel extends AbstractTableModel {
     }
 
 
-    public Object getValueAt(int rowIndex, int columnIndex) {
+   public Object getValueAt(int rowIndex, int columnIndex) {
 
-        switch(columnIndex) {
+        OrderAudit order = orders.get(rowIndex);
 
-            case 0:
-                return "10/02/2011" ;
+        try {
+            switch(columnIndex) {
+                case 0:
+                        String indicator = "";
+                        Integer id = order.getId();
+                        if(dirty.get(id) != null)
+                        indicator = "* ";
+                        return id + indicator;
 
-            case 1:
-                return 12;
+                case 1: return DateFormatter.toString(order.getStamp());
 
-            case 2:
-                return "SMF65" ;
-                
-            case 3:
-                return "C3PO84" ;
+                case 2: return order.getOrdersize();
 
+                case 3: return order.getPoNumber();
+
+                case 4: return order.getOrderNumber();
+
+             }
+        }
+        catch(Exception e) {
+            System.out.println("Order did not render..");
         }
 
         return null;
     }
 
-    /**
-     * Get a order by row;
+/**
+     * Get a stock by row;
      * @param row Row
-     * @return Order
+     * @return Stock
      */
-    //public Order getRow(int row) {
-        //if(row < 0 || row >= .size())
-            //return null;
+    public OrderAudit getRow(int row) {
 
-        //return .get(row);
-    //}
+        if(row < 0 || row >= orders.size())
+            return null;
 
-    /**
-     * Removes a order from the table
-     */
-
-    public void remove(int row) {
-        // .remove(row);
+        return orders.get(row);
     }
 
-     /**
-     * Refreshes a order table
+    /**
+     * Removes a stock from the table
+     */
+    public void remove(int row) {
+        orders.remove(row);
+    }
+
+     @Override
+    public void setValueAt(Object value, int row, int col) {
+
+         OrderAudit order = getRow(row);
+
+        switch(col) {
+            case 2: int size = 0;
+                    try
+                    {
+                    size = Integer.parseInt(value.toString());
+                    }catch(Exception ex){
+
+                        JOptionPane.showMessageDialog(null,"Orders size must be a positive integer.",
+                                        "Required parameters missing",
+                                        JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    order.setOrdersize(size);
+                    break;
+            case 3:
+                   order.setPoNumber((String)value);
+                   break;
+
+            case 4:
+                   order.setOrderNumber((String)value);
+                   break;
+
+        }
+
+        dirty.put(order.getId(),order);
+
+        this.fireTableDataChanged();
+
+    }
+
+    /**
+     * Refreshes the table of stock;
      */
     public void refresh() {
 
-        this.fireTableDataChanged();
+        try {
+
+            String criteria = "/list";
+
+
+            orders = Helper.query("Orders", criteria, context);
+
+            dirty.clear();
+            this.fireTableDataChanged();
+
+        }
+        catch (Exception e) {
+            System.out.println("Trainings refresh failed..");
+        }
     }
 
+
+
+    public HashMap<Integer,OrderAudit> getDirty() {
+        return dirty;
+    }
 
 }

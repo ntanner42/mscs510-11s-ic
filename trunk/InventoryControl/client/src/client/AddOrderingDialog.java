@@ -11,10 +11,15 @@
 
 package client;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.workplicity.util.Helper;
 import org.workplicity.util.WorkDate;
+import org.workplicity.inventorycontrol.entry.OrderAudit;
+import org.workplicity.util.DateFormatter;
+import org.workplicity.worklet.WorkletContext;
 
 /**
  *
@@ -22,14 +27,56 @@ import org.workplicity.util.WorkDate;
  */
 public class AddOrderingDialog extends javax.swing.JDialog {
 
+    private ArrayList<OrderAudit> currentOrder = new ArrayList<OrderAudit>( );
+
     /** Creates new form AddOrderingDialog */
-    public AddOrderingDialog(java.awt.Frame parent, boolean modal) {
+    public AddOrderingDialog(java.awt.Frame parent,OrderAudit order, boolean modal) {
         super(parent, modal);
         initComponents();
 
+        try {
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+
+            }
         this.setLocationRelativeTo(null);
-        this.setTitle("Add Order");
+
+        currentOrder.add(order);
+
+        // custom initialization for add stock.
+        init(order);
     }
+
+    private void init(OrderAudit order){
+
+        if (!( order.getStamp() == null)){
+
+            String orderDate = DateFormatter.toString(order.getStamp());
+            orderingDateTextField.setText(orderDate);
+        }
+        else
+        {
+            Calendar calendar = Calendar.getInstance();
+
+            String orderDate = DateFormatter.toString(calendar.getTime());
+
+            orderingDateTextField.setText(orderDate);
+
+        }
+
+        if (!( order.getOrdersize() == null)){
+            sizeTextField.setText(order.getOrdersize().toString());
+        }
+        if (! (order.getPoNumber() == null)){
+            poNumberTextField.setText(order.getPoNumber().toString());
+        }
+        if (! (order.getOrderNumber() == null)){
+            orderNumberTextField.setText(order.getOrderNumber().toString());
+        }
+       
+
+    }
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -49,6 +96,8 @@ public class AddOrderingDialog extends javax.swing.JDialog {
         poNumberTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        orderNumberTextField = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -62,6 +111,7 @@ public class AddOrderingDialog extends javax.swing.JDialog {
             }
         });
 
+        orderingDateTextField.setEditable(false);
         orderingDateTextField.setText(resourceMap.getString("orderingDateTextField.text")); // NOI18N
         orderingDateTextField.setName("orderingDateTextField"); // NOI18N
         orderingDateTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -106,6 +156,12 @@ public class AddOrderingDialog extends javax.swing.JDialog {
         jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
         jLabel3.setName("jLabel3"); // NOI18N
 
+        orderNumberTextField.setText(resourceMap.getString("orderNumberTextField.text")); // NOI18N
+        orderNumberTextField.setName("orderNumberTextField"); // NOI18N
+
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -117,14 +173,18 @@ public class AddOrderingDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel4)
                             .addComponent(jLabel3)
-                            .addComponent(jLabel2))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(poNumberTextField)
-                            .addComponent(orderingDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(sizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(calendarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(poNumberTextField)
+                                    .addComponent(orderingDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(sizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(calendarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(orderNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(61, 61, 61))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -150,11 +210,15 @@ public class AddOrderingDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(poNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(41, 41, 41)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(orderNumberTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveButton)
                     .addComponent(cancelButton))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         pack();
@@ -170,8 +234,87 @@ public class AddOrderingDialog extends javax.swing.JDialog {
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add your handling code here:
-         dispose();
+
+        String orderDate = orderingDateTextField.getText().toString();
+        String size = sizeTextField.getText().toString();
+        String poNumber = poNumberTextField.getText().toString();
+        String orderNumber = orderNumberTextField.getText().toString();
+
+        Integer orderSize = 0;
+
+        OrderAudit newOrder = currentOrder.get(0);
+
+        String errorMessage = "";
+
+        if(orderDate.equals("")  || orderDate.isEmpty())
+        {
+            errorMessage += "Please select a order date.\n";
+
+        }
+
+        if ((size.equals("")) || size.equals("Enter size") || size.isEmpty())
+        {
+            errorMessage += "Please enter order size.\n";
+
+        }
+
+        try{
+            orderSize = Integer.parseInt(size);
+        }catch(Exception ex){
+            errorMessage += "Order size must be a positive integer value.\n";
+        }
+
+        if(poNumber.equals("") || poNumber.equals("Enter PO #") || poNumber.isEmpty())
+        {
+            errorMessage += "Please enter PO number.\n";
+
+        }
+
+        if (orderNumber.equals("") || orderNumber.equals("Enter order #") || orderNumber.isEmpty())
+        {
+            errorMessage += "Please enter order name.\n";
+        }
+
+        if(errorMessage.length() > 0) {
+
+            JOptionPane.showMessageDialog(this,errorMessage,
+                                        "Required parameters missing",
+                                        JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            WorkDate date = Helper.toDate(orderingDateTextField.getText());
+
+            newOrder.setStamp(date);
+            newOrder.setOrdersize(orderSize);
+            newOrder.setPoNumber(poNumber);
+            newOrder.setOrderNumber(orderNumber);
+
+            insertOrder(newOrder);
+
+            dispose();
+        }
+
     }//GEN-LAST:event_saveButtonActionPerformed
+
+
+    private void insertOrder(OrderAudit newOrder){
+
+        final AddOrderingDialog frame = this;
+        WorkletContext context = WorkletContext.getInstance();
+
+        System.out.println(newOrder.getId());
+
+         if (!Helper.insert(newOrder, "Orders", context)) {
+             JOptionPane.showMessageDialog(frame, "insert order into orders failed!",
+                "Orders", JOptionPane.ERROR_MESSAGE);
+
+             return;
+         }// end if
+
+         System.out.println(newOrder.getId());
+
+    }
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
@@ -219,7 +362,7 @@ public class AddOrderingDialog extends javax.swing.JDialog {
                 } catch (Exception e) {
 
                 }
-                AddOrderingDialog dialog = new AddOrderingDialog(new javax.swing.JFrame(), true);
+                AddOrderingDialog dialog = new AddOrderingDialog(new javax.swing.JFrame(),null, true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -237,6 +380,8 @@ public class AddOrderingDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JTextField orderNumberTextField;
     private javax.swing.JTextField orderingDateTextField;
     private javax.swing.JTextField poNumberTextField;
     private javax.swing.JButton saveButton;
