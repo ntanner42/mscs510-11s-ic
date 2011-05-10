@@ -17,7 +17,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.workplicity.elog.entry.ElogUser;
 import org.workplicity.entry.User;
+import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Training;
+import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.util.DateFormatter;
 import org.workplicity.util.Helper;
 import org.workplicity.util.WorkDate;
@@ -30,9 +32,11 @@ import org.workplicity.worklet.WorkletContext;
 public class AddTrainingDialog extends javax.swing.JDialog {
 
     private ArrayList<Training> currentTraining = new ArrayList<Training>( );
+    private ArrayList<Inventory> currentInventory = new ArrayList<Inventory>( );
+    private ArrayList<Item> currentItem = new ArrayList<Item>( );
     private ArrayList<ElogUser> users = new ArrayList<ElogUser>( );
     /** Creates new form AddTrainingDialog */
-    public AddTrainingDialog(java.awt.Frame parent, Training training, boolean modal) {
+    public AddTrainingDialog(java.awt.Frame parent,Inventory inventory, Item item, Training training, boolean modal) {
         super(parent, modal);
 
         initComponents();
@@ -43,6 +47,8 @@ public class AddTrainingDialog extends javax.swing.JDialog {
             }
         this.setLocationRelativeTo(null);
 
+        currentInventory.add(inventory);
+        currentItem.add(item);
         currentTraining.add(training);
 
         // custom initialization for add stock.
@@ -349,19 +355,59 @@ public class AddTrainingDialog extends javax.swing.JDialog {
 
         final AddTrainingDialog frame = this;
         WorkletContext context = WorkletContext.getInstance();
+        Item item = currentItem.get(0);
+        Inventory inventory = currentInventory.get(0);
 
-        
+        System.out.println(training.getId());
 
-         System.out.println(training.getId());
-        
-         if (!Helper.insert(training, "Trainings", context)) {
+        if (!Helper.insert(training, "Trainings", context)) {
              JOptionPane.showMessageDialog(frame, "insert training into Trainings failed!",
                 "Trainings", JOptionPane.ERROR_MESSAGE);
 
              return;
-         }// end if
+        }// end if
 
-         System.out.println(training.getId());     
+        System.out.println(training.getId()); 
+
+        int trainingID = training.getId();
+        boolean trainingExists = false;
+
+        if(!(item.getTrainings().isEmpty() ))
+        {
+            for(int i=0; i < item.getTrainings().size();i++)
+            {
+                int itemTrainingID = item.getTrainings().get(i).getId();
+                
+                if ((itemTrainingID == trainingID))
+                {
+                    trainingExists = true;
+                }// end if
+
+            }// end for
+        }// end if
+
+        if(!(trainingExists))
+        {
+            ArrayList<Training> itemTrainings = item.getTrainings();
+            
+            itemTrainings.add(training);
+
+            item.setTrainings(itemTrainings);
+
+            inventory.insert(item);
+
+            System.out.println(item.getId());
+
+            if (!Helper.insert(item, "Inventories", context)) {
+                System.out.println("insert Item into Inventory failed!");
+
+            }
+
+            System.out.println(item.getId());
+
+        }
+        
+           
 
     }
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
@@ -407,7 +453,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 
-                AddTrainingDialog dialog = new AddTrainingDialog(new javax.swing.JFrame(),null, true);
+                AddTrainingDialog dialog = new AddTrainingDialog(new javax.swing.JFrame(),null, null, null, true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

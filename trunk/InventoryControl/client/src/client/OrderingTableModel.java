@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
+import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.util.DateFormatter;
 import org.workplicity.worklet.WorkletContext;
 import org.workplicity.inventorycontrol.entry.OrderAudit;
@@ -22,6 +23,7 @@ import org.workplicity.util.Helper;
 public class OrderingTableModel extends AbstractTableModel {
 
    ArrayList<OrderAudit> orders = new ArrayList<OrderAudit>();
+   ArrayList<OrderAudit> requiredOrders = new ArrayList<OrderAudit>();
    private HashMap<Integer,OrderAudit> dirty = new HashMap<Integer,OrderAudit>( );
    WorkletContext context = WorkletContext.getInstance();
     /**
@@ -42,7 +44,7 @@ public class OrderingTableModel extends AbstractTableModel {
 
 
     public int getRowCount() {
-        return orders.size();
+        return requiredOrders.size();
     }
 
     public int getColumnCount() {
@@ -62,7 +64,7 @@ public class OrderingTableModel extends AbstractTableModel {
 
    public Object getValueAt(int rowIndex, int columnIndex) {
 
-        OrderAudit order = orders.get(rowIndex);
+        OrderAudit order = requiredOrders.get(rowIndex);
 
         try {
             switch(columnIndex) {
@@ -97,17 +99,17 @@ public class OrderingTableModel extends AbstractTableModel {
      */
     public OrderAudit getRow(int row) {
 
-        if(row < 0 || row >= orders.size())
+        if(row < 0 || row >= requiredOrders.size())
             return null;
 
-        return orders.get(row);
+        return requiredOrders.get(row);
     }
 
     /**
      * Removes a stock from the table
      */
     public void remove(int row) {
-        orders.remove(row);
+        requiredOrders.remove(row);
     }
 
      @Override
@@ -148,14 +150,37 @@ public class OrderingTableModel extends AbstractTableModel {
     /**
      * Refreshes the table of stock;
      */
-    public void refresh() {
+    public void refresh(Item item) {
 
         try {
 
             String criteria = "/list";
 
-
             orders = Helper.query("Orders", criteria, context);
+
+            requiredOrders.clear();
+
+            for(int i=0; i< orders.size();i++)
+            {
+
+                OrderAudit order = orders.get(i);
+
+                if(!(item.getOrderHistory().isEmpty() ))
+                {
+                    for(int j=0; j < item.getOrderHistory().size();j++)
+                    {
+                        int itemOrderID = item.getOrderHistory().get(j).getId();
+
+                        int orderID = order.getId();
+                         if ( itemOrderID == orderID)
+                         {
+                                requiredOrders.add(order);
+                         }// end if
+
+                    }// end for
+                }// end if
+
+            }// end for
 
             dirty.clear();
             this.fireTableDataChanged();

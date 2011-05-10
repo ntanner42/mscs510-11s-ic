@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.workplicity.inventorycontrol.entry.Inventory;
+import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.util.Helper;
 import org.workplicity.util.WorkDate;
 import org.workplicity.inventorycontrol.entry.OrderAudit;
@@ -28,9 +30,11 @@ import org.workplicity.worklet.WorkletContext;
 public class AddOrderingDialog extends javax.swing.JDialog {
 
     private ArrayList<OrderAudit> currentOrder = new ArrayList<OrderAudit>( );
+    private ArrayList<Inventory> currentInventory = new ArrayList<Inventory>( );
+    private ArrayList<Item> currentItem = new ArrayList<Item>( );
 
     /** Creates new form AddOrderingDialog */
-    public AddOrderingDialog(java.awt.Frame parent,OrderAudit order, boolean modal) {
+    public AddOrderingDialog(java.awt.Frame parent,Inventory inventory, Item item, OrderAudit order, boolean modal) {
         super(parent, modal);
         initComponents();
 
@@ -41,6 +45,8 @@ public class AddOrderingDialog extends javax.swing.JDialog {
             }
         this.setLocationRelativeTo(null);
 
+        currentInventory.add(inventory);
+        currentItem.add(item);
         currentOrder.add(order);
 
         // custom initialization for add stock.
@@ -302,6 +308,8 @@ public class AddOrderingDialog extends javax.swing.JDialog {
 
         final AddOrderingDialog frame = this;
         WorkletContext context = WorkletContext.getInstance();
+        Item item = currentItem.get(0);
+        Inventory inventory = currentInventory.get(0);
 
         System.out.println(newOrder.getId());
 
@@ -314,7 +322,45 @@ public class AddOrderingDialog extends javax.swing.JDialog {
 
          System.out.println(newOrder.getId());
 
-    }
+         int orderID = newOrder.getId();
+         boolean trainingExists = false;
+
+         if(!(item.getOrderHistory().isEmpty() ))
+         {
+            for(int i=0; i < item.getOrderHistory().size();i++)
+            {
+                int itemOrderID = item.getOrderHistory().get(i).getId();
+
+                if ((itemOrderID == orderID))
+                {
+                    trainingExists = true;
+                }// end if
+
+            }// end for
+         }// end if
+
+         if(!(trainingExists))
+         {
+            ArrayList<OrderAudit> itemOrders = item.getOrderHistory();
+
+            itemOrders.add(newOrder);
+
+            item.setOrderHistory(itemOrders);
+
+            inventory.insert(item);
+
+            System.out.println(item.getId());
+
+            if (!Helper.insert(item, "Inventories", context)) {
+                System.out.println("insert Item into Inventory failed!");
+
+            }
+
+            System.out.println(item.getId());
+
+         }
+        
+     }
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
@@ -362,7 +408,7 @@ public class AddOrderingDialog extends javax.swing.JDialog {
                 } catch (Exception e) {
 
                 }
-                AddOrderingDialog dialog = new AddOrderingDialog(new javax.swing.JFrame(),null, true);
+                AddOrderingDialog dialog = new AddOrderingDialog(new javax.swing.JFrame(),null, null, null, true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
