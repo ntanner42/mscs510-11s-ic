@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.elog.entry.ElogUser;
+import org.workplicity.entry.User.Type;
 import org.workplicity.util.DateFormatter;
 import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
@@ -24,6 +25,7 @@ public class UsersTableModel extends AbstractTableModel {
     private static String[] columnNames = {
         "Id",
         "Updated",
+        "Type",
         "Username",
         "Password",
         "First name",
@@ -68,21 +70,24 @@ public class UsersTableModel extends AbstractTableModel {
         switch(col)
         {
             case 2:
-                user.setLogname((String) value);
+                user.setType((Type) value);
                 break;
             case 3:
-                user.setPassword((String) value);
+                user.setLogname((String) value);
                 break;
             case 4:
-                user.setFirstName((String)value);
+                user.setPassword((String) value);
                 break;
             case 5:
-                user.setLastName((String)value);
+                user.setFirstName((String)value);
                 break;
             case 6:
-                user.setPhone((String)value);
+                user.setLastName((String)value);
                 break;
             case 7:
+                user.setPhone((String)value);
+                break;
+            case 8:
                 user.setEmail((String) value);
                 break;
         }
@@ -110,16 +115,18 @@ public class UsersTableModel extends AbstractTableModel {
                 case 1:
                     return DateFormatter.toString(user.getUpdateDate());
                 case 2:
-                    return user.getLogname();
+                    return user.getType().toString();
                 case 3:
-                    return user.getPassword();
+                    return user.getLogname();
                 case 4:
-                    return user.getFirstName();
+                    return user.getPassword();
                 case 5:
-                    return user.getLastName();
+                    return user.getFirstName();
                 case 6:
-                    return user.getPhone();
+                    return user.getLastName();
                 case 7:
+                    return user.getPhone();
+                case 8:
                     return user.getEmail();
             }
         }

@@ -10,8 +10,11 @@
  */
 package client;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import javax.swing.JOptionPane;
 import org.workplicity.elog.entry.ElogUser;
+import org.workplicity.entry.User.Type;
 
 /**
  *
@@ -22,12 +25,37 @@ public class AddUserDialog extends javax.swing.JDialog {
     private boolean addedUser = false;
 
     /** Creates new form AddUserDialog */
-    public AddUserDialog(java.awt.Frame parent, boolean modal) {
+    public AddUserDialog(java.awt.Frame parent, boolean modal)
+    {
         super(parent, modal);
         initComponents();
 
         this.setLocationRelativeTo(null);
         this.setTitle("Add User");
+
+        // Get the screen size object
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension screenSize = tk.getScreenSize();
+
+        // Get the size of the screen
+        int screenHeight = screenSize.height;
+        int screenWidth = screenSize.width;
+
+        // Get the size of the current window
+        int windowHeight = this.getHeight();
+        int windowWidth = this.getWidth();
+
+        int newX = (screenWidth / 2) - (windowWidth / 2);
+        int newY = (screenHeight / 2) - (windowHeight / 2);
+        this.setLocation(newX, newY);
+
+        // Populate the combo box
+        typeComboBox.addItem(ElogUser.Type.ADMIN);
+        typeComboBox.addItem(ElogUser.Type.NA);
+        typeComboBox.addItem(ElogUser.Type.REQUESTOR);
+        typeComboBox.addItem(ElogUser.Type.SUPERVISOR);
+        typeComboBox.addItem(ElogUser.Type.VIEWER);
+        typeComboBox.addItem(ElogUser.Type.WORKER);
     }
 
     public boolean addedUser() {
@@ -57,6 +85,8 @@ public class AddUserDialog extends javax.swing.JDialog {
         passwordTextField = new javax.swing.JTextField();
         userNameTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        typeComboBox = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -110,31 +140,45 @@ public class AddUserDialog extends javax.swing.JDialog {
         jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
         jLabel2.setName("jLabel2"); // NOI18N
 
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
+        typeComboBox.setName("typeComboBox"); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(saveButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cancelButton))
+                            .addComponent(emailTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(phoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(lastNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(firstNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(typeComboBox, 0, 226, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(saveButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cancelButton))
-                    .addComponent(emailTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addComponent(phoneTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addComponent(lastNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addComponent(passwordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addComponent(userNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                    .addComponent(firstNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
+                        .addGap(33, 33, 33)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(passwordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                            .addComponent(userNameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -145,9 +189,13 @@ public class AddUserDialog extends javax.swing.JDialog {
                     .addComponent(userNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(typeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -265,6 +313,7 @@ public class AddUserDialog extends javax.swing.JDialog {
     private javax.swing.JTextField firstNameTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -273,6 +322,7 @@ public class AddUserDialog extends javax.swing.JDialog {
     private javax.swing.JTextField passwordTextField;
     private javax.swing.JTextField phoneTextField;
     private javax.swing.JButton saveButton;
+    private javax.swing.JComboBox typeComboBox;
     private javax.swing.JTextField userNameTextField;
     // End of variables declaration//GEN-END:variables
 
@@ -282,6 +332,7 @@ public class AddUserDialog extends javax.swing.JDialog {
 
         userToReturn.setLogname(userNameTextField.getText());
         userToReturn.setPassword(passwordTextField.getText());
+        userToReturn.setType((Type) typeComboBox.getSelectedItem());
         userToReturn.setFirstName(firstNameTextField.getText());
         userToReturn.setLastName(lastNameTextField.getText());
         userToReturn.setEmail(emailTextField.getText());
