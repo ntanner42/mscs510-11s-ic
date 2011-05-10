@@ -1599,27 +1599,27 @@ public class ItemDialog extends javax.swing.JDialog {
 
                 try {
 
-                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
-
-                        if(!Helper.login("admin","gaze11e",context))
-                            throw new Exception("login failed");
-
-                    String criteria1 = "/list[1]";
-                    //Issuing the query using the helper to the Inventories repository
-                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
-                    if (inventories == null) {
-                        throw new Exception("bad query");
-                    }
-
-                    Inventory inventory = inventories.get(0);
-
-                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
-                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
-
-                    Item item = items.get(0);
-           
-                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
-//                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
+//                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+//
+//                        if(!Helper.login("admin","gaze11e",context))
+//                            throw new Exception("login failed");
+//
+//                    String criteria1 = "/list[1]";
+//                    //Issuing the query using the helper to the Inventories repository
+//                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
+//                    if (inventories == null) {
+//                        throw new Exception("bad query");
+//                    }
+//
+//                    Inventory inventory = inventories.get(0);
+//
+//                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+//                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
+//
+//                    Item item = items.get(0);
+//
+//                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
+                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
                     dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
