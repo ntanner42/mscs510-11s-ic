@@ -184,7 +184,8 @@ public class ItemDialog extends javax.swing.JDialog {
         });
 
         TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
-        model.refresh();
+        Item item = currentItem.get(0);
+        model.refresh(item);
     }
 
     private Training editTrainingRequest(int row) {
@@ -239,7 +240,8 @@ public class ItemDialog extends javax.swing.JDialog {
         });
 
         OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
-        model.refresh();
+        Item item = currentItem.get(0);
+        model.refresh(item);
     }
 
     private OrderAudit editOrdersRequest(int row) {
@@ -659,9 +661,9 @@ public class ItemDialog extends javax.swing.JDialog {
 
     private void deleteOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteOrderButtonActionPerformed
 
-
-        
         final ItemDialog frame = this;
+        final Inventory inventory = currentInventory.get(0);
+        final Item item = currentItem.get(0);
 
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -676,7 +678,7 @@ public class ItemDialog extends javax.swing.JDialog {
                         JOptionPane.ERROR_MESSAGE);
                 }
                 else
-                 {
+                {
                         OrderAudit order = editOrdersRequest(row);
                        // TODO add delete Location handling code here:
 
@@ -697,6 +699,37 @@ public class ItemDialog extends javax.swing.JDialog {
 
                             refreshOrder();
 
+                            ArrayList<OrderAudit> itemOrders = new ArrayList<OrderAudit>();
+
+                            for (OrderAudit itemorder: item.getOrderHistory()){
+
+                                if(itemorder.getId().toString().equals(order.getId().toString()))
+                                {
+                                    item.getOrderHistory().remove(order);
+                                }
+                                else
+                                {
+                                    itemOrders.add(itemorder);
+                                }
+                            }
+
+
+                            item.getOrderHistory().clear();
+                            item.setOrderHistory(itemOrders);
+
+                            inventory.insert(item);
+                            System.out.println(item.getId());
+
+                            if (!Helper.insert(item, "Inventories", context)) {
+                                System.out.println("insert Item into Inventory failed!");
+                                return;
+                            }
+
+                            currentItem.clear();
+                            currentItem.add(item);
+
+                            System.out.println(item.getId());
+
                             if (!Helper.delete(order, "Orders", context)) {
                                 System.out.print("Delete failed!");
                             }
@@ -705,10 +738,10 @@ public class ItemDialog extends javax.swing.JDialog {
                                 System.out.print("Delete successful");
                             }
 
-                }catch(Exception ex){
+                          }catch(Exception ex){
 
-               }
-              }
+                            }
+                    }
                  refreshOrder();
                  model.fireTableDataChanged();
 
@@ -1033,6 +1066,7 @@ public class ItemDialog extends javax.swing.JDialog {
     private void refreshTraining()
     {
         final ItemDialog frame = this;
+        final Item item = currentItem.get(0);
 
 
         TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
@@ -1040,7 +1074,7 @@ public class ItemDialog extends javax.swing.JDialog {
         final HashMap<Integer, Training> dirty = model.getDirty();
 
         if (model.getDirty().isEmpty()) {
-            model.refresh();
+            model.refresh(item);
             return;
         }
 
@@ -1054,7 +1088,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 JOptionPane.YES_NO_OPTION);
 
         if (n == 1) {
-            model.refresh();
+            model.refresh(item);
             return;
         }
 
@@ -1066,6 +1100,7 @@ public class ItemDialog extends javax.swing.JDialog {
     {
         final ItemDialog frame = this;
         //WorkletContext context = WorkletContext.getInstance();
+        final Item item = currentItem.get(0);
 
         TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
         final HashMap<Integer, Training> dirty = model.getDirty();
@@ -1086,14 +1121,14 @@ public class ItemDialog extends javax.swing.JDialog {
 
         }// end foreach
  
-        model.refresh();
-
+        model.refresh(item);
         
     }
 
      private void refreshOrder()
      {
         final ItemDialog frame = this;
+        final Item item = currentItem.get(0);
 
 
         OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
@@ -1101,7 +1136,7 @@ public class ItemDialog extends javax.swing.JDialog {
         final HashMap<Integer, OrderAudit> dirty = model.getDirty();
 
         if (model.getDirty().isEmpty()) {
-            model.refresh();
+            model.refresh(item);
             return;
         }
 
@@ -1115,7 +1150,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 JOptionPane.YES_NO_OPTION);
 
         if (n == 1) {
-            model.refresh();
+            model.refresh(item);
             return;
         }
 
@@ -1126,6 +1161,7 @@ public class ItemDialog extends javax.swing.JDialog {
     private void saveOrders()
     {
         final ItemDialog frame = this;
+        final Item item = currentItem.get(0);
         //WorkletContext context = WorkletContext.getInstance();
 
         OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
@@ -1147,7 +1183,7 @@ public class ItemDialog extends javax.swing.JDialog {
 
         }// end foreach
 
-        model.refresh();
+        model.refresh(item);
 
     }
 
@@ -1282,6 +1318,8 @@ public class ItemDialog extends javax.swing.JDialog {
     private void addTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrainingButtonActionPerformed
         
         final ItemDialog dialog = this;
+        final Inventory inventory = currentInventory.get(0);
+        final Item item = currentItem.get(0);
         final Training training = new Training();
 
         refreshTraining();
@@ -1291,10 +1329,11 @@ public class ItemDialog extends javax.swing.JDialog {
                               
                     // Displays add training dialog
                     AddTrainingDialog trainingDialog =
-                            new AddTrainingDialog( null ,training, true);
+                            new AddTrainingDialog( null ,inventory, item, training, true);
 
-                    trainingDialog.setVisible(true);
                     trainingDialog.setTitle("Add new Training");
+                    trainingDialog.setVisible(true);
+                    
 
                     refreshTraining();
 
@@ -1306,6 +1345,8 @@ public class ItemDialog extends javax.swing.JDialog {
         // TODO add delete training button handling code here:
         
         final ItemDialog frame = this;
+        final Inventory inventory = currentInventory.get(0);
+        final Item item = currentItem.get(0);
 
         SwingUtilities.invokeLater(new Runnable()
         {
@@ -1340,6 +1381,40 @@ public class ItemDialog extends javax.swing.JDialog {
                         {
 
                             refreshTraining();
+
+                            ArrayList<Training> itemTrainings = new ArrayList<Training>(); 
+              
+                            for (Training itemTraining: item.getTrainings()){
+
+                                if(itemTraining.getId().toString().equals(training.getId().toString()))
+                                {
+                                    item.getTrainings().remove(training);
+                                }
+                                else
+                                {
+                                    itemTrainings.add(itemTraining);
+                                }
+                            }
+
+
+                            item.getTrainings().clear();
+                            item.setTrainings(itemTrainings);
+
+
+
+
+                            inventory.insert(item);
+                            System.out.println(item.getId());
+
+                            if (!Helper.insert(item, "Inventories", context)) {
+                                System.out.println("insert Item into Inventory failed!");
+                                return;
+                            }
+
+                            currentItem.clear();
+                            currentItem.add(item);
+                            
+                            System.out.println(item.getId());
                            
                             if (!Helper.delete(training, "Trainings", context)) {
                                 System.out.print("Delete failed!");
@@ -1364,6 +1439,8 @@ public class ItemDialog extends javax.swing.JDialog {
     private void addOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addOrderButtonActionPerformed
         // TODO add your handling code here:
          final ItemDialog dialog = this;
+         final Inventory inventory = currentInventory.get(0);
+         final Item item = currentItem.get(0);
          final OrderAudit order = new OrderAudit();
          refreshOrder();
 
@@ -1373,11 +1450,10 @@ public class ItemDialog extends javax.swing.JDialog {
                 try {
                      // Displays add ordering dialog
                     AddOrderingDialog orderingDialog =
-                            new AddOrderingDialog( null ,order, true);
-
-                    orderingDialog.setVisible(true);
-
+                            new AddOrderingDialog( null ,inventory, item, order, true);
+                   
                     orderingDialog.setTitle("Add new order");
+                    orderingDialog.setVisible(true);
 
                     refreshOrder();
 
@@ -1433,6 +1509,8 @@ public class ItemDialog extends javax.swing.JDialog {
     private void drillDownTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownTrainingButtonActionPerformed
         // TODO add your handling code here:
         final ItemDialog frame = this;
+        final Inventory inventory = currentInventory.get(0);
+        final Item item = currentItem.get(0);
 
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -1457,10 +1535,11 @@ public class ItemDialog extends javax.swing.JDialog {
                         refreshTraining();
 
                         AddTrainingDialog stockDialog =
-                                new AddTrainingDialog( null , training, true);
-                        stockDialog.setVisible(true);
-                        stockDialog.setTitle("Edit training");
+                                new AddTrainingDialog( null ,inventory, item, training, true);
 
+                        stockDialog.setTitle("Edit training");
+                        stockDialog.setVisible(true);
+                        
                         refreshTraining();
                 }
             }
@@ -1471,6 +1550,8 @@ public class ItemDialog extends javax.swing.JDialog {
     private void drillDownOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownOrderButtonActionPerformed
         // TODO add your handling code here:
         final ItemDialog frame = this;
+        final Inventory inventory = currentInventory.get(0);
+        final Item item = currentItem.get(0);
 
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -1495,9 +1576,11 @@ public class ItemDialog extends javax.swing.JDialog {
                         refreshOrder();
 
                         AddOrderingDialog orderDialog =
-                                new AddOrderingDialog( null , order, true);
-                        orderDialog.setVisible(true);
+                                new AddOrderingDialog( null ,inventory, item, order, true);
+
                         orderDialog.setTitle("Edit Order");
+                        orderDialog.setVisible(true);
+                        
 
                         refreshOrder();
                 }
@@ -1516,27 +1599,27 @@ public class ItemDialog extends javax.swing.JDialog {
 
                 try {
 
-//                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
-//
-//                        if(!Helper.login("admin","gaze11e",context))
-//                            throw new Exception("login failed");
-//
-//                    String criteria1 = "/list[1]";
-//                    //Issuing the query using the helper to the Inventories repository
-//                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
-//                    if (inventories == null) {
-//                        throw new Exception("bad query");
-//                    }
-//
-//                    Inventory inventory = inventories.get(0);
-//
-//                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
-//                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
-//
-//                    Item item = items.get(0);
+                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+
+                        if(!Helper.login("admin","gaze11e",context))
+                            throw new Exception("login failed");
+
+                    String criteria1 = "/list[1]";
+                    //Issuing the query using the helper to the Inventories repository
+                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
+                    if (inventories == null) {
+                        throw new Exception("bad query");
+                    }
+
+                    Inventory inventory = inventories.get(0);
+
+                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
+
+                    Item item = items.get(0);
            
-//                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
-                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
+                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
+//                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
                     dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

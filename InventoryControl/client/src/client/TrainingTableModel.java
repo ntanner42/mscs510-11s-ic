@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
+import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.inventorycontrol.entry.Training;
 import org.workplicity.inventorycontrol.entry.Training.Status;
 import org.workplicity.util.DateFormatter;
@@ -22,6 +23,7 @@ import org.workplicity.worklet.WorkletContext;
 public class TrainingTableModel extends AbstractTableModel{
 
      ArrayList<Training> trainings = new ArrayList<Training>();
+     ArrayList<Training> requiredTrainings = new ArrayList<Training>();
      private HashMap<Integer,Training> dirty = new HashMap<Integer,Training>( );
      WorkletContext context = WorkletContext.getInstance();
      /**
@@ -44,7 +46,7 @@ public class TrainingTableModel extends AbstractTableModel{
 
 
     public int getRowCount() {
-        return trainings.size();
+        return requiredTrainings.size();
     }
 
     public int getColumnCount() {
@@ -62,7 +64,7 @@ public class TrainingTableModel extends AbstractTableModel{
 
     public Object getValueAt(int rowIndex, int columnIndex) {
 
-        Training training = trainings.get(rowIndex);
+        Training training = requiredTrainings.get(rowIndex);
         
         try {
             switch(columnIndex) {
@@ -100,17 +102,17 @@ public class TrainingTableModel extends AbstractTableModel{
      */
     public Training getRow(int row) {
 
-        if(row < 0 || row >= trainings.size())
+        if(row < 0 || row >= requiredTrainings.size())
             return null;
 
-        return trainings.get(row);
+        return requiredTrainings.get(row);
     }
 
     /**
      * Removes a stock from the table
      */
     public void remove(int row) {
-        trainings.remove(row);
+        requiredTrainings.remove(row);
     }
 
      @Override
@@ -144,16 +146,37 @@ public class TrainingTableModel extends AbstractTableModel{
     /**
      * Refreshes the table of stock;
      */
-    public void refresh() {
+    public void refresh(Item item) {
 
-        try {
-
-            
+        try
+        {
 
             String criteria = "/list";
-
-
             trainings = Helper.query("Trainings", criteria, context);
+
+            requiredTrainings.clear();
+
+            for(int i=0; i< trainings.size();i++)
+            {
+
+                Training training = trainings.get(i);
+
+                if(!(item.getTrainings().isEmpty() ))
+                {
+                    for(int j=0; j < item.getTrainings().size();j++)
+                    {
+                        int itemTrainingID = item.getTrainings().get(j).getId();
+
+                        int trainingID = training.getId();
+                         if ( itemTrainingID == trainingID)
+                         {
+                                requiredTrainings.add(training);
+                         }// end if
+
+                    }// end for
+                }// end if
+
+            }// end for
 
             dirty.clear();
             this.fireTableDataChanged();
