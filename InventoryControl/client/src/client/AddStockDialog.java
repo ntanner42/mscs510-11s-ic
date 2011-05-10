@@ -26,7 +26,6 @@ import org.workplicity.worklet.WorkletContext;
  */
 public class AddStockDialog extends javax.swing.JDialog {
 
-
     private ArrayList<Item> currentItem = new ArrayList<Item>( );
     private ArrayList<Inventory> currentInventory = new ArrayList<Inventory>( );
     private ArrayList<Stock> currentStock = new ArrayList<Stock>( );
@@ -38,7 +37,7 @@ public class AddStockDialog extends javax.swing.JDialog {
         initComponents();
          try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
+            } catch (Exception ex) {
 
             }
         this.setLocationRelativeTo(null);

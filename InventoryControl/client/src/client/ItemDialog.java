@@ -23,6 +23,7 @@ import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.inventorycontrol.entry.Stock;
 import org.workplicity.inventorycontrol.entry.Training;
+import org.workplicity.inventorycontrol.entry.OrderAudit;
 import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
@@ -203,10 +204,12 @@ public class ItemDialog extends javax.swing.JDialog {
         ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         final int[] WIDTHS = {
-             90,  // Order Date
-             82,  // Size
+
+             40,  // Order ID
+            100,  // Order Date
+             60,  // Size
             100,  // PO #
-            100   // Order #
+             70   // Order #
 
         };
 
@@ -228,14 +231,25 @@ public class ItemDialog extends javax.swing.JDialog {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                            // call method to perform task on double click
+                            editOrdersRequest(row);
                         }
                     });
                 }
             }
         });
 
-        //OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
-        //model.refresh();
+        OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
+        model.refresh();
+    }
+
+    private OrderAudit editOrdersRequest(int row) {
+
+        OrderingTableModel ordersModel = (OrderingTableModel) ordersTable.getModel();
+
+        OrderAudit selectedorder = ordersModel.getRow(row);
+
+        return selectedorder;
+
     }
 
     /** This method is called from within the constructor to
@@ -644,21 +658,63 @@ public class ItemDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void deleteOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteOrderButtonActionPerformed
-        OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
-        // TODO add delete order handling code here:
-        String msg = "Are sure to delete this order?";
 
-        int n = JOptionPane.showConfirmDialog(
-                null,
-                msg,
-                "Confirm",
-                JOptionPane.YES_NO_OPTION);
 
-        if (n == 1) {
-            return;
+        
+        final ItemDialog frame = this;
 
-        }
-        model.fireTableDataChanged();
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
+                int row = ordersTable.getSelectedRow();
+                if (row == -1){
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select an order from the table to delete ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+                else
+                 {
+                        OrderAudit order = editOrdersRequest(row);
+                       // TODO add delete Location handling code here:
+
+                        String msg = "Are sure to delete this order?";
+
+                        int n = JOptionPane.showConfirmDialog(
+                                null,
+                                msg,
+                                "Confirm",
+                                JOptionPane.YES_NO_OPTION);
+
+                        if (n == 1) {
+                            return;
+                        }
+
+                        try
+                        {
+
+                            refreshOrder();
+
+                            if (!Helper.delete(order, "Orders", context)) {
+                                System.out.print("Delete failed!");
+                            }
+                            else
+                            {
+                                System.out.print("Delete successful");
+                            }
+
+                }catch(Exception ex){
+
+               }
+              }
+                 refreshOrder();
+                 model.fireTableDataChanged();
+
+                }
+
+          });
     }//GEN-LAST:event_deleteOrderButtonActionPerformed
 
     private void itemNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemNameTextFieldActionPerformed
@@ -1034,7 +1090,67 @@ public class ItemDialog extends javax.swing.JDialog {
 
         
     }
-  
+
+     private void refreshOrder()
+     {
+        final ItemDialog frame = this;
+
+
+        OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
+
+        final HashMap<Integer, OrderAudit> dirty = model.getDirty();
+
+        if (model.getDirty().isEmpty()) {
+            model.refresh();
+            return;
+        }
+
+        String msg = "Some orders have changed.";
+        msg += "\nSave them?";
+
+        int n = JOptionPane.showConfirmDialog(
+                frame,
+                msg,
+                "Confirm",
+                JOptionPane.YES_NO_OPTION);
+
+        if (n == 1) {
+            model.refresh();
+            return;
+        }
+
+        saveOrders();
+
+    }
+
+    private void saveOrders()
+    {
+        final ItemDialog frame = this;
+        //WorkletContext context = WorkletContext.getInstance();
+
+        OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
+        final HashMap<Integer, OrderAudit> dirty = model.getDirty();
+
+        for(Integer id : dirty.keySet()) {
+
+            OrderAudit changedOrder = dirty.get(id);
+
+            System.out.println(changedOrder.getId());
+
+            if (!Helper.insert(changedOrder, "Orders", context)) {
+                    JOptionPane.showMessageDialog(frame, "insert order into Trainings failed!",
+                    "Orders", JOptionPane.ERROR_MESSAGE);
+                    return;
+            }
+
+            System.out.println(changedOrder.getId());
+
+        }// end foreach
+
+        model.refresh();
+
+    }
+
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         // TODO add refresh button handling code here:
        final ItemDialog frame = this;
@@ -1045,20 +1161,23 @@ public class ItemDialog extends javax.swing.JDialog {
                 int selectedTab = frame.itemTabbedPane.getSelectedIndex();
                 switch(selectedTab)
                 {
-                    case 0:  boolean isItemValid = validateBasicItemInformation();
+                    case 0:
+                             boolean isItemValid = validateBasicItemInformation();
                              if(isItemValid)
                              {
                                    refreshBasicItemInformation();
                              }
                              break;
 
-                    case 1: refreshStock();
+                    case 1:
+                            refreshStock();
                             break;
+
                     case 2:
                             refreshTraining();
                             break;
                     case 3: 
-                            //refreshOrders();
+                            refreshOrder();
                             break;
 
                     default:
@@ -1092,6 +1211,8 @@ public class ItemDialog extends javax.swing.JDialog {
 
                    saveTraining();
 
+                   saveOrders();
+
                    dispose();
                }        
 
@@ -1119,6 +1240,8 @@ public class ItemDialog extends javax.swing.JDialog {
                    refreshStock();
 
                    refreshTraining();
+
+                   refreshOrder();
 
                    dispose();
                }
@@ -1241,15 +1364,22 @@ public class ItemDialog extends javax.swing.JDialog {
     private void addOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addOrderButtonActionPerformed
         // TODO add your handling code here:
          final ItemDialog dialog = this;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
+         final OrderAudit order = new OrderAudit();
+         refreshOrder();
+
+         SwingUtilities.invokeLater(new Runnable() {
+            
             public void run() {
                 try {
                      // Displays add ordering dialog
                     AddOrderingDialog orderingDialog =
-                            new AddOrderingDialog( null , true);
+                            new AddOrderingDialog( null ,order, true);
 
                     orderingDialog.setVisible(true);
+
+                    orderingDialog.setTitle("Add new order");
+
+                    refreshOrder();
 
                 } catch (Exception e) {
                     //Logger.log(e.toString());
@@ -1313,7 +1443,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 if (row == -1){
 
                         JOptionPane.showMessageDialog(frame,
-                        "Please select a training from the table to view ",
+                        "Please select a training from the table to edit ",
                         "No selection made",
                         JOptionPane.ERROR_MESSAGE);
 
@@ -1340,6 +1470,41 @@ public class ItemDialog extends javax.swing.JDialog {
 
     private void drillDownOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownOrderButtonActionPerformed
         // TODO add your handling code here:
+        final ItemDialog frame = this;
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+
+            public void run() {
+
+                int row = ordersTable.getSelectedRow();
+                if (row == -1){
+
+                        JOptionPane.showMessageDialog(frame,
+                        "Please select an order from the table to edit ",
+                        "No selection made",
+                        JOptionPane.ERROR_MESSAGE);
+
+                }
+                else
+                 {
+                        // Displays add stock dialog
+                        OrderAudit order = new OrderAudit();
+                        order = editOrdersRequest(row);
+
+                        refreshOrder();
+
+                        AddOrderingDialog orderDialog =
+                                new AddOrderingDialog( null , order, true);
+                        orderDialog.setVisible(true);
+                        orderDialog.setTitle("Edit Order");
+
+                        refreshOrder();
+                }
+            }
+        });
+
+
     }//GEN-LAST:event_drillDownOrderButtonActionPerformed
 
     /**
@@ -1351,26 +1516,27 @@ public class ItemDialog extends javax.swing.JDialog {
 
                 try {
 
-                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
-
-                        if(!Helper.login("admin","gaze11e",context))
-                            throw new Exception("login failed");
-
-                    String criteria1 = "/list[1]";
-                    //Issuing the query using the helper to the Inventories repository
-                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
-                    if (inventories == null) {
-                        throw new Exception("bad query");
-                    }
-
-                    Inventory inventory = inventories.get(0);
-
-                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
-                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
-
-                    Item item = items.get(0);
+//                   NetTask.setUrlBase("http://localhost:8080/netprevayle/task");
+//
+//                        if(!Helper.login("admin","gaze11e",context))
+//                            throw new Exception("login failed");
+//
+//                    String criteria1 = "/list[1]";
+//                    //Issuing the query using the helper to the Inventories repository
+//                   ArrayList<Inventory> inventories = Helper.query("Inventories", criteria1, context);
+//                    if (inventories == null) {
+//                        throw new Exception("bad query");
+//                    }
+//
+//                    Inventory inventory = inventories.get(0);
+//
+//                    String criteria2 = "/list[inventoryId=" + inventory.getId().toString() + "]";
+//                    ArrayList<Item> items = Helper.query("Inventories", criteria2, context);
+//
+//                    Item item = items.get(0);
            
-                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
+//                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),inventory, item, true);
+                    ItemDialog dialog = new ItemDialog(new javax.swing.JFrame(),null, null, true);
                     dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
