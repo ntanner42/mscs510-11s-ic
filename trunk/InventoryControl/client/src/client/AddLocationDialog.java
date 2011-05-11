@@ -41,6 +41,13 @@ public class AddLocationDialog extends javax.swing.JDialog {
         this.setLocationRelativeTo(null);
 
         currentlocation.add(location);
+
+        if (location.getId() == -1 )
+        {
+            this.setTitle("Add new location");
+        }else{
+            this.setTitle("Edit location");
+        }
         
 
         // custom initialization for add location.

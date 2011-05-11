@@ -10,6 +10,7 @@ import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Location;
 import org.workplicity.task.NetTask;
+import org.workplicity.util.DateFormatter;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
 
@@ -27,6 +28,7 @@ public class LocationsTableModel extends AbstractTableModel {
      */
     private static String[] columnNames = {
         "Id",
+        "Updated",
         "Name",
     };
 
@@ -46,7 +48,7 @@ public class LocationsTableModel extends AbstractTableModel {
 
      @Override
     public boolean isCellEditable(int row, int col) {
-        if(col == 1)
+        if(col == 2)
             return true;      
 
             return false;
@@ -78,6 +80,10 @@ public class LocationsTableModel extends AbstractTableModel {
                 valueToReturn = location.getId().toString();
             }
             else if(col == 1)
+            {
+                valueToReturn = DateFormatter.toString(location.getUpdateDate());
+            }
+            else if(col == 2)
             {
                 valueToReturn = location.getName();
             }
