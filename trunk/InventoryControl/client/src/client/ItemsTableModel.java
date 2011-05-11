@@ -10,6 +10,7 @@ import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Inventory;
 import org.workplicity.inventorycontrol.entry.Item;
+import org.workplicity.util.DateFormatter;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
 
@@ -124,27 +125,22 @@ public class ItemsTableModel extends AbstractTableModel
                 }
 
                 valueToReturn = id + indicator;
-                //valueToReturn = "5";
             }
             else if(col == 1)
             {
-                valueToReturn = item.getUpdateDate();
-                //valueToReturn = "12/04/2010";
+                valueToReturn = DateFormatter.toString(item.getUpdateDate());
             }
             else if(col == 2)
             {
                 valueToReturn = item.getModelNumber();
-                //valueToReturn = "ASF500";
             }
             else if(col == 3)
             {
                 valueToReturn = item.getName();
-                //valueToReturn = "Hoover";
             }
             else if(col == 4)
             {
                 valueToReturn = item.getDescription();
-                //valueToReturn = "It's a Hoover, Jim";
             }
         
         }
