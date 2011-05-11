@@ -45,7 +45,8 @@ public class LocationsDialog extends javax.swing.JDialog {
 
         final int[] WIDTHS = {
              40,  // Id
-            305,  // Name
+            100,  // UpdateDate
+            205,  // Name
            
         };
 

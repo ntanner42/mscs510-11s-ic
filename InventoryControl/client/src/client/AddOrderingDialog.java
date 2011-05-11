@@ -49,6 +49,13 @@ public class AddOrderingDialog extends javax.swing.JDialog {
         currentItem.add(item);
         currentOrder.add(order);
 
+        if (order.getId() == -1 )
+        {
+            this.setTitle("Add new order");
+        }else{
+            this.setTitle("Edit order");
+        }
+
         // custom initialization for add stock.
         init(order);
     }

@@ -51,6 +51,13 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         currentItem.add(item);
         currentTraining.add(training);
 
+        if (training.getId() == -1 )
+        {
+            this.setTitle("Add new training");
+        }else{
+            this.setTitle("Edit training");
+        }
+
         // custom initialization for add stock.
         init(training);
              

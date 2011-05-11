@@ -46,6 +46,12 @@ public class AddStockDialog extends javax.swing.JDialog {
         currentInventory.add(inventory);
         currentStock.add(stock);
 
+        if (stock.getId() == -1 )
+        {
+            this.setTitle("Add new stock");
+        }else{
+            this.setTitle("Edit stock");
+        }
         // custom initialization for add stock.
         init( inventory,item, stock);
         

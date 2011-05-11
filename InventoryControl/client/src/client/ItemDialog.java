@@ -694,58 +694,60 @@ public class ItemDialog extends javax.swing.JDialog {
                             return;
                         }
 
-                        try
-                        {
+                        if (n == 0) {
+                            try
+                            {
 
-                            refreshOrder();
+                                refreshOrder();
 
-                            ArrayList<OrderAudit> itemOrders = new ArrayList<OrderAudit>();
+                                ArrayList<OrderAudit> itemOrders = new ArrayList<OrderAudit>();
 
-                            for (OrderAudit itemorder: item.getOrderHistory()){
+                                for (OrderAudit itemorder: item.getOrderHistory()){
 
-                                if(itemorder.getId().toString().equals(order.getId().toString()))
-                                {
-                                    item.getOrderHistory().remove(order);
+                                    if(itemorder.getId().toString().equals(order.getId().toString()))
+                                    {
+                                        item.getOrderHistory().remove(order);
+                                    }
+                                    else
+                                    {
+                                        itemOrders.add(itemorder);
+                                    }
+                                }
+
+
+                                item.getOrderHistory().clear();
+                                item.setOrderHistory(itemOrders);
+
+                                inventory.insert(item);
+                                System.out.println(item.getId());
+
+                                if (!Helper.insert(item, "Inventories", context)) {
+                                    System.out.println("insert Item into Inventory failed!");
+                                    return;
+                                }
+
+                                currentItem.clear();
+                                currentItem.add(item);
+
+                                System.out.println(item.getId());
+
+                                if (!Helper.delete(order, "Orders", context)) {
+                                    System.out.print("Delete failed!");
                                 }
                                 else
                                 {
-                                    itemOrders.add(itemorder);
+                                    System.out.print("Delete successful");
                                 }
-                            }
 
+                              }catch(Exception ex){
 
-                            item.getOrderHistory().clear();
-                            item.setOrderHistory(itemOrders);
-
-                            inventory.insert(item);
-                            System.out.println(item.getId());
-
-                            if (!Helper.insert(item, "Inventories", context)) {
-                                System.out.println("insert Item into Inventory failed!");
-                                return;
-                            }
-
-                            currentItem.clear();
-                            currentItem.add(item);
-
-                            System.out.println(item.getId());
-
-                            if (!Helper.delete(order, "Orders", context)) {
-                                System.out.print("Delete failed!");
-                            }
-                            else
-                            {
-                                System.out.print("Delete successful");
-                            }
-
-                          }catch(Exception ex){
-
-                            }
-                    }
-                 refreshOrder();
-                 model.fireTableDataChanged();
+                                }
+                        }
+                     refreshOrder();
+                     model.fireTableDataChanged();
 
                 }
+            }
 
           });
     }//GEN-LAST:event_deleteOrderButtonActionPerformed
@@ -789,22 +791,25 @@ public class ItemDialog extends javax.swing.JDialog {
                         return;
 
                     }
+                    if (n == 0)
+                    {
 
-                    try{
-                        if (!Helper.delete(stock, "Inventories", context)) {
-                            System.out.print("Delete failed!");
-                        }
-                        else
-                        {
-                            System.out.print("Delete successful");
-                        }
-                     }catch(Exception ex){
+                        try{
+                            if (!Helper.delete(stock, "Inventories", context)) {
+                                System.out.print("Delete failed!");
+                            }
+                            else
+                            {
+                                System.out.print("Delete successful");
+                            }
+                         }catch(Exception ex){
 
-                     }
-                     }
+                         }
+                         }
 
-                     refreshStock();
-                     model.fireTableDataChanged();
+                         refreshStock();
+                         model.fireTableDataChanged();
+                    }
                     
                 }
 
@@ -842,9 +847,11 @@ public class ItemDialog extends javax.swing.JDialog {
                 model.refresh(inventory, item);
                 return;
             }
+             if (n==0)
+            {
 
-            saveStock(inventory,item);
-                
+                saveStock(inventory,item);
+            }
 
 
     }// end refresh stock
@@ -942,8 +949,11 @@ public class ItemDialog extends javax.swing.JDialog {
                 return;
             }
 
-            saveBasicItemInformation();
+             if (n==0)
+            {
 
+                saveBasicItemInformation();
+            }
         }
 }
 
@@ -1091,9 +1101,10 @@ public class ItemDialog extends javax.swing.JDialog {
             model.refresh(item);
             return;
         }
-
-        saveTraining();
-
+        if (n == 0)
+        {
+           saveTraining();
+        }
     }
 
     private void saveTraining()
@@ -1154,8 +1165,11 @@ public class ItemDialog extends javax.swing.JDialog {
             return;
         }
 
-        saveOrders();
+         if (n==0)
+        {
 
+            saveOrders();
+         }
     }
 
     private void saveOrders()
@@ -1294,7 +1308,7 @@ public class ItemDialog extends javax.swing.JDialog {
     private void addStockButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addStockButtonActionPerformed
         
         
-        final ItemDialog frame = this;
+        final  ItemDialog frame = this;
         final  Item item = currentItem.get(0);
         final  Inventory inventory = currentInventory.get(0);
         final  Stock stock = new Stock();
@@ -1377,59 +1391,62 @@ public class ItemDialog extends javax.swing.JDialog {
                             return;
                         }
 
-                        try
+                         if (n==0)
                         {
+                            try
+                            {
 
-                            refreshTraining();
+                                refreshTraining();
 
-                            ArrayList<Training> itemTrainings = new ArrayList<Training>(); 
-              
-                            for (Training itemTraining: item.getTrainings()){
+                                ArrayList<Training> itemTrainings = new ArrayList<Training>();
 
-                                if(itemTraining.getId().toString().equals(training.getId().toString()))
-                                {
-                                    item.getTrainings().remove(training);
+                                for (Training itemTraining: item.getTrainings()){
+
+                                    if(itemTraining.getId().toString().equals(training.getId().toString()))
+                                    {
+                                        item.getTrainings().remove(training);
+                                    }
+                                    else
+                                    {
+                                        itemTrainings.add(itemTraining);
+                                    }
+                                }
+
+
+                                item.getTrainings().clear();
+                                item.setTrainings(itemTrainings);
+
+
+
+
+                                inventory.insert(item);
+                                System.out.println(item.getId());
+
+                                if (!Helper.insert(item, "Inventories", context)) {
+                                    System.out.println("insert Item into Inventory failed!");
+                                    return;
+                                }
+
+                                currentItem.clear();
+                                currentItem.add(item);
+
+                                System.out.println(item.getId());
+
+                                if (!Helper.delete(training, "Trainings", context)) {
+                                    System.out.print("Delete failed!");
                                 }
                                 else
                                 {
-                                    itemTrainings.add(itemTraining);
+                                    System.out.print("Delete successful");
                                 }
-                            }
 
+                        }catch(Exception ex){
 
-                            item.getTrainings().clear();
-                            item.setTrainings(itemTrainings);
-
-
-
-
-                            inventory.insert(item);
-                            System.out.println(item.getId());
-
-                            if (!Helper.insert(item, "Inventories", context)) {
-                                System.out.println("insert Item into Inventory failed!");
-                                return;
-                            }
-
-                            currentItem.clear();
-                            currentItem.add(item);
-                            
-                            System.out.println(item.getId());
-                           
-                            if (!Helper.delete(training, "Trainings", context)) {
-                                System.out.print("Delete failed!");
-                            }
-                            else
-                            {
-                                System.out.print("Delete successful");
-                            }
-
-                }catch(Exception ex){
-
-               }
-              }
-                 refreshTraining();
-                 model.fireTableDataChanged();
+                       }
+                      }
+                         refreshTraining();
+                         model.fireTableDataChanged();
+                    }
 
                 }
 
@@ -1565,6 +1582,7 @@ public class ItemDialog extends javax.swing.JDialog {
                         "Please select an order from the table to edit ",
                         "No selection made",
                         JOptionPane.ERROR_MESSAGE);
+
 
                 }
                 else
