@@ -58,7 +58,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
             this.setTitle("Edit training");
         }
 
-        // custom initialization for add stock.
+        // custom initialization for add training.
         init(training);
              
     }
@@ -277,7 +277,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_trainingDateTextFieldActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
+       
 
         String trainingDate = trainingDateTextField.getText().toString();
         String modelID = modelIdTextField.getText().toString();
@@ -290,7 +290,7 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         Training newTraining = currentTraining.get(0);
         
         String errorMessage = "";
-
+        // validates the user entries in the text fields and combo boxes.
         if(trainingDate.equals("")  || trainingDate.isEmpty())
         {
             errorMessage += "Please select a training date.\n";
@@ -358,6 +358,10 @@ public class AddTrainingDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_saveButtonActionPerformed
 
+    /** This method inserts the training passed into the trainings repository.
+     * The method also included the training in the item training list and updates the item.
+     */
+
     private void insertTraining(Training training){
 
         final AddTrainingDialog frame = this;
@@ -378,6 +382,12 @@ public class AddTrainingDialog extends javax.swing.JDialog {
 
         int trainingID = training.getId();
         boolean trainingExists = false;
+
+        //gets the items training array list.
+         // checks if the training is already present in it.
+         // if it is not present it adds the new training to the item training list.
+         // and inserts new training to trainings repository.
+         // if it exisits it proceeds to update the existing training
 
         if(!(item.getTrainings().isEmpty() ))
         {

@@ -6,7 +6,6 @@
 package client;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import javax.swing.table.AbstractTableModel;
 import org.workplicity.inventorycontrol.entry.Inventory;
