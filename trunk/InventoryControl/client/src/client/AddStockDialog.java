@@ -46,6 +46,7 @@ public class AddStockDialog extends javax.swing.JDialog {
         currentInventory.add(inventory);
         currentStock.add(stock);
 
+        // Sets the dialog title accordingly
         if (stock.getId() == -1 )
         {
             this.setTitle("Add new stock");
@@ -55,10 +56,11 @@ public class AddStockDialog extends javax.swing.JDialog {
         // custom initialization for add stock.
         init( inventory,item, stock);
         
-    }// end AddStockDialod constructor
+    }// end AddStockDialog constructor
 
     private void init(Inventory inventory, Item item, Stock stock){
 
+        // sets the textfields with appropriate values if a stock is being edited.
         if (!( stock.getPartNumber() == null)){
               partNumberTextField.setText(stock.getPartNumber().toString());
         }
@@ -219,7 +221,7 @@ public class AddStockDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_partNumberTextFieldActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add save handling code here:
+
 
         String partNumber = partNumberTextField.getText().toString();
         String rmaNumber = rmaNumberTextField.getText().toString();
@@ -230,7 +232,9 @@ public class AddStockDialog extends javax.swing.JDialog {
         Stock newStock = currentStock.get(0);
         Item item = currentItem.get(0);
         Inventory inventory = currentInventory.get(0);
-       
+
+        //validates the data entered in the text fields and combo boxes and displays error
+        // dialog if any deviation is found
         String errorMessage = "";
 
         if((partNumber.equals("")  || partNumber.equals("Enter part number")) || partNumber.isEmpty())
@@ -265,6 +269,7 @@ public class AddStockDialog extends javax.swing.JDialog {
         }
         else
         {
+            // sets the new values to stock object passed
             newStock.setPartNumber(partNumber);
             newStock.setAssetTag(assetTag);
             newStock.setSerialNumber(serialNumber);
@@ -276,6 +281,10 @@ public class AddStockDialog extends javax.swing.JDialog {
             dispose();
         }
     }//GEN-LAST:event_saveButtonActionPerformed
+
+    /** This method inserts the stock passed into the inventories repository.
+     * 
+     */
 
  private void insertStock(Item item,Inventory inventory,Stock newStock){
 
@@ -321,7 +330,7 @@ public class AddStockDialog extends javax.swing.JDialog {
 
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add cancel handling code here:
+        // cancels and closes the dialog and returns to parent.
         
          dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed

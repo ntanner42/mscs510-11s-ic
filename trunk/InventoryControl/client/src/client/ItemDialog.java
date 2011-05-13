@@ -24,7 +24,6 @@ import org.workplicity.inventorycontrol.entry.Item;
 import org.workplicity.inventorycontrol.entry.Stock;
 import org.workplicity.inventorycontrol.entry.Training;
 import org.workplicity.inventorycontrol.entry.OrderAudit;
-import org.workplicity.task.NetTask;
 import org.workplicity.util.Helper;
 import org.workplicity.worklet.WorkletContext;
 
@@ -78,10 +77,11 @@ public class ItemDialog extends javax.swing.JDialog {
      }
 
      /**
-     * Initializes the Basic item information.
+     * Initializes the Basic item information tab.
      */
      private void initBasicItemInformation( Item item){
 
+         // sets the values for text fields in the basic item information tab.
          this.itemNameTextField.setText(item.getName().toString());
          this.itemDescriptionTextField.setText(item.getDescription().toString());
          this.itemModelTextField.setText(item.getModelNumber().toString());
@@ -111,7 +111,7 @@ public class ItemDialog extends javax.swing.JDialog {
             col.setPreferredWidth(WIDTHS[i]);
         }
 
-        // Add mouse support for the request table
+        // Add mouse support for the stock table
         // See http://mycodepage.blogspot.com/2006/09/how-to-create-double-click-event-on.html
         stockTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -131,13 +131,17 @@ public class ItemDialog extends javax.swing.JDialog {
         model.refresh(inventory,item);
     }
 
+    /**
+    * Returns the selected stock from the table.
+    */
+
     private Stock editStockRequest(int row) {
         StockTableModel stockModel = (StockTableModel) stockTable.getModel();
 
         Stock selectedStock = stockModel.getRow(row);
 
         return selectedStock;
-        //System.out.println(selectedStock);
+       
     }
 
     /**
@@ -187,6 +191,10 @@ public class ItemDialog extends javax.swing.JDialog {
         Item item = currentItem.get(0);
         model.refresh(item);
     }
+
+    /**
+    * Returns the selected training request from the training table.
+    */
 
     private Training editTrainingRequest(int row) {
         TrainingTableModel trainingModel = (TrainingTableModel) trainingTable.getModel();
@@ -244,6 +252,9 @@ public class ItemDialog extends javax.swing.JDialog {
         model.refresh(item);
     }
 
+    /**
+    * Returns the selected order request from the orders table.
+    */
     private OrderAudit editOrdersRequest(int row) {
 
         OrderingTableModel ordersModel = (OrderingTableModel) ordersTable.getModel();
@@ -671,6 +682,7 @@ public class ItemDialog extends javax.swing.JDialog {
             {
                 OrderingTableModel model = (OrderingTableModel) ordersTable.getModel();
                 int row = ordersTable.getSelectedRow();
+                // if no row is selected , prompts the user to select a row to be deleted.
                 if (row == -1){
                         JOptionPane.showMessageDialog(frame,
                         "Please select an order from the table to delete ",
@@ -679,9 +691,10 @@ public class ItemDialog extends javax.swing.JDialog {
                 }
                 else
                 {
+                        // retrieves the selected row.
                         OrderAudit order = editOrdersRequest(row);
-                       // TODO add delete Location handling code here:
 
+                        // gets user confirmation to delete the row.
                         String msg = "Are sure to delete this order?";
 
                         int n = JOptionPane.showConfirmDialog(
@@ -697,11 +710,12 @@ public class ItemDialog extends javax.swing.JDialog {
                         if (n == 0) {
                             try
                             {
-
+                                // checks if the orders in the table are changed.If they are prompts the user to save them.
                                 refreshOrder();
 
                                 ArrayList<OrderAudit> itemOrders = new ArrayList<OrderAudit>();
-
+                                // checks and removes the order selected from the
+                                // items order history list if it exists.
                                 for (OrderAudit itemorder: item.getOrderHistory()){
 
                                     if(itemorder.getId().toString().equals(order.getId().toString()))
@@ -721,6 +735,7 @@ public class ItemDialog extends javax.swing.JDialog {
                                 inventory.insert(item);
                                 System.out.println(item.getId());
 
+                                // inserts the changed item to the inventories repository.
                                 if (!Helper.insert(item, "Inventories", context)) {
                                     System.out.println("insert Item into Inventory failed!");
                                     return;
@@ -731,6 +746,7 @@ public class ItemDialog extends javax.swing.JDialog {
 
                                 System.out.println(item.getId());
 
+                                // deletes the order from the orders repository.
                                 if (!Helper.delete(order, "Orders", context)) {
                                     System.out.print("Delete failed!");
                                 }
@@ -743,6 +759,7 @@ public class ItemDialog extends javax.swing.JDialog {
 
                                 }
                         }
+                     // refreshes the view.
                      refreshOrder();
                      model.fireTableDataChanged();
 
@@ -766,6 +783,7 @@ public class ItemDialog extends javax.swing.JDialog {
             {
                 StockTableModel model = (StockTableModel) stockTable.getModel();
                 int row = stockTable.getSelectedRow();
+                 // if no row is selected , prompts the user to select a stock to be deleted.
                 if (row == -1){
 
                         JOptionPane.showMessageDialog(frame,
@@ -776,9 +794,10 @@ public class ItemDialog extends javax.swing.JDialog {
                 }
                 else
                  {
+                    // retrieves the stock from the select row.
                     Stock stock = editStockRequest(row);
                     
-                   // TODO add delete stock handling code here:
+                   // accepts users confirmation for delete.
                     String msg = "Are sure to delete this stock?";
 
                     int n = JOptionPane.showConfirmDialog(
@@ -794,6 +813,7 @@ public class ItemDialog extends javax.swing.JDialog {
                     if (n == 0)
                     {
 
+                        // deletes the stock from the inventories repository.
                         try{
                             if (!Helper.delete(stock, "Inventories", context)) {
                                 System.out.print("Delete failed!");
@@ -807,6 +827,7 @@ public class ItemDialog extends javax.swing.JDialog {
                          }
                          }
 
+                         // refreshes the view.
                          refreshStock();
                          model.fireTableDataChanged();
                     }
@@ -817,6 +838,11 @@ public class ItemDialog extends javax.swing.JDialog {
         
     }//GEN-LAST:event_deleteStockButtonActionPerformed
 
+    /**
+    * Checks if the values in the table are changed. Prompts the user regarding the changes,
+    * refreshes the view based on user action. Saves the changes if user wishes to save the stocks.
+    * If user action is not to save resets the table data.
+    */
 
     private void refreshStock(){
 
@@ -827,6 +853,7 @@ public class ItemDialog extends javax.swing.JDialog {
             Inventory inventory = currentInventory.get(0);
             StockTableModel model = (StockTableModel) stockTable.getModel();
 
+            // retrieves the changed stocks
             final HashMap<Integer, Stock> dirty = model.getDirty();
 
             if (model.getDirty().isEmpty()) {
@@ -834,6 +861,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 return;
             }
 
+            // prompts the user if the stock details are changed.
             String msg = "Some stocks have changed.";
             msg += "\nSave them?";
 
@@ -849,18 +877,20 @@ public class ItemDialog extends javax.swing.JDialog {
             }
              if (n==0)
             {
-
                 saveStock(inventory,item);
             }
 
 
     }// end refresh stock
 
+
+    /**
+    * saves the changed stocks and commits them to the repository
+    */
     private void saveStock(Inventory inventory,Item item){
 
         final ItemDialog frame = this;
-        //WorkletContext context = WorkletContext.getInstance();
-
+        
         StockTableModel model = (StockTableModel) stockTable.getModel();
         final HashMap<Integer, Stock> dirty = model.getDirty();
 
@@ -898,9 +928,18 @@ public class ItemDialog extends javax.swing.JDialog {
 
               }// end for
 
+        // refreshes the view.
         model.refresh(inventory, item);
 
     }// end saveStock
+
+
+
+    /**
+    * Checks if item details are changed. Prompts the user regarding the changes,
+    * refreshes the view based on user action. Saves the changes if user wishes to save the item.
+    * If user action is not to save resets the item details to original values.
+    */
 
     private void refreshBasicItemInformation(){
 
@@ -910,7 +949,7 @@ public class ItemDialog extends javax.swing.JDialog {
         Inventory inventory = currentInventory.get(0);
         boolean isBasicItemInformationChanged = false;
 
-
+        // checks if the item details are edited.
         if (!(this.itemNameTextField.getText().toString().equals(item.getName().toString())))
         {
             isBasicItemInformationChanged = true;
@@ -932,6 +971,7 @@ public class ItemDialog extends javax.swing.JDialog {
             isBasicItemInformationChanged = true;
         }
 
+        // if item details are edited then prompts user action.
         if(isBasicItemInformationChanged)
         {
             String msg = "Some item details have changed.";
@@ -944,18 +984,23 @@ public class ItemDialog extends javax.swing.JDialog {
                     JOptionPane.YES_NO_OPTION);
 
             if (n == 1) {
-                
+                // restores original values
                 initBasicItemInformation(item);
                 return;
             }
 
              if (n==0)
             {
-
+                // saves the edited item details
                 saveBasicItemInformation();
             }
         }
-}
+    }
+
+    /**
+    * Saves the changed item details for an item.
+    * 
+    */
 
     private void saveBasicItemInformation(){
 
@@ -1001,6 +1046,12 @@ public class ItemDialog extends javax.swing.JDialog {
         System.out.println(item.getId());
  
     }
+
+    /**
+    * Validates the changes in the basic item information tab.
+    * Checks if required parameters are entered correctly.
+    * Returns a boolean true if the input is correct.
+    */
 
     private boolean validateBasicItemInformation(){
 
@@ -1059,7 +1110,7 @@ public class ItemDialog extends javax.swing.JDialog {
             }
         }
 
-
+        // Displays a list of errors to the user if the user input is wrong.
         if(errorMessage.length() > 0) {
 
             JOptionPane.showMessageDialog(this,errorMessage,
@@ -1073,6 +1124,12 @@ public class ItemDialog extends javax.swing.JDialog {
 
     }
 
+    /**
+    * Checks if any changes are made to training table. Prompts the user to save changes.
+    * Restores original values if user selects no. Saves changes if user selects yes.
+    *
+    */
+
     private void refreshTraining()
     {
         final ItemDialog frame = this;
@@ -1083,11 +1140,12 @@ public class ItemDialog extends javax.swing.JDialog {
 
         final HashMap<Integer, Training> dirty = model.getDirty();
 
+        // checks for changes the training table.
         if (model.getDirty().isEmpty()) {
             model.refresh(item);
             return;
         }
-
+        // prompts the user to save changes if any.
         String msg = "Some trainings have changed.";
         msg += "\nSave them?";
 
@@ -1098,15 +1156,21 @@ public class ItemDialog extends javax.swing.JDialog {
                 JOptionPane.YES_NO_OPTION);
 
         if (n == 1) {
+            // restores to original values by clearing changes.
             model.refresh(item);
             return;
         }
         if (n == 0)
         {
+            // saves the changes in training table.
            saveTraining();
         }
     }
 
+    /**
+    * Saves the changes made to training table
+    *
+    */
     private void saveTraining()
     {
         final ItemDialog frame = this;
@@ -1136,6 +1200,11 @@ public class ItemDialog extends javax.swing.JDialog {
         
     }
 
+   /**
+    * Checks if any changes are made to orders table. Prompts the user to save changes.
+    * Restores original values if user selects no. Saves changes if user selects yes.
+    *
+    */
      private void refreshOrder()
      {
         final ItemDialog frame = this;
@@ -1150,7 +1219,7 @@ public class ItemDialog extends javax.swing.JDialog {
             model.refresh(item);
             return;
         }
-
+        // prompts user to saves changes if any.
         String msg = "Some orders have changed.";
         msg += "\nSave them?";
 
@@ -1172,6 +1241,10 @@ public class ItemDialog extends javax.swing.JDialog {
          }
     }
 
+    /**
+    * Saves the changes made to training table
+    *
+    */
     private void saveOrders()
     {
         final ItemDialog frame = this;
@@ -1197,6 +1270,7 @@ public class ItemDialog extends javax.swing.JDialog {
 
         }// end foreach
 
+        // refreshes the view
         model.refresh(item);
 
     }
@@ -1204,14 +1278,23 @@ public class ItemDialog extends javax.swing.JDialog {
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         // TODO add refresh button handling code here:
        final ItemDialog frame = this;
-       SwingUtilities.invokeLater(new Runnable() {
+       
+
+//       stockTable.changeSelection(0, 0, rootPaneCheckingEnabled, rootPaneCheckingEnabled);
+//       trainingTable.changeSelection(0, 0, rootPaneCheckingEnabled, rootPaneCheckingEnabled);
+//       ordersTable.changeSelection(0, 0, rootPaneCheckingEnabled, rootPaneCheckingEnabled);
+       
+
+       SwingUtilities.invokeLater(new Runnable() {  
+
 
            public void run() {
 
                 int selectedTab = frame.itemTabbedPane.getSelectedIndex();
+                // refresh the data in selected tab only.
                 switch(selectedTab)
                 {
-                    case 0:
+                    case 0: // validates and refreshes basic item information
                              boolean isItemValid = validateBasicItemInformation();
                              if(isItemValid)
                              {
@@ -1219,14 +1302,14 @@ public class ItemDialog extends javax.swing.JDialog {
                              }
                              break;
 
-                    case 1:
+                    case 1: // validates and refreshes stock table
                             refreshStock();
                             break;
 
-                    case 2:
+                    case 2: // validates and refreshs training table
                             refreshTraining();
                             break;
-                    case 3: 
+                    case 3: // validates nad refreshes orders table
                             refreshOrder();
                             break;
 
@@ -1247,6 +1330,7 @@ public class ItemDialog extends javax.swing.JDialog {
         final ItemDialog frame = this;
         SwingUtilities.invokeLater(new Runnable() {
 
+
            public void run() {
 
                Item item = currentItem.get(0);
@@ -1255,12 +1339,13 @@ public class ItemDialog extends javax.swing.JDialog {
                boolean isItemValid = validateBasicItemInformation();
                if(isItemValid)
                {
+                   // validates and saves changes made to item
                    saveBasicItemInformation();
-
+                   // saves changes made to stock table
                    saveStock(inventory,item);
-
+                   // saves changes made in training table
                    saveTraining();
-
+                   // saves changes made to orders table.
                    saveOrders();
 
                    dispose();
@@ -1276,8 +1361,7 @@ public class ItemDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void doneButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneButtonActionPerformed
-        // TODO add done handling code here:
-        // TODO add refresh button handling code here:
+       
        SwingUtilities.invokeLater(new Runnable() {
 
            public void run() {
@@ -1285,12 +1369,13 @@ public class ItemDialog extends javax.swing.JDialog {
                boolean isItemValid = validateBasicItemInformation();
                if(isItemValid)
                {
+                   // checks and prompts user to save changed Item information
                    refreshBasicItemInformation();
-
+                   // checks and prompts user to save changed stocks
                    refreshStock();
-
+                  // checks and prompts user to save changed trainings
                    refreshTraining();
-
+                   // checks and prompts user to save chenged orders
                    refreshOrder();
 
                    dispose();
@@ -1313,7 +1398,8 @@ public class ItemDialog extends javax.swing.JDialog {
         final  Inventory inventory = currentInventory.get(0);
         final  Stock stock = new Stock();
 
-
+        // checks for changes made to other stocks.
+        // prompts user to save changes if any.
         refreshStock();
        
         SwingUtilities.invokeLater(new Runnable() {            
@@ -1324,6 +1410,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 stockDialog.setVisible(true);
                 stockDialog.setTitle("Add new stock");
 
+                // refreshes the view to reflect addition of new stock
                 refreshStock();
             }
         });
@@ -1336,6 +1423,8 @@ public class ItemDialog extends javax.swing.JDialog {
         final Item item = currentItem.get(0);
         final Training training = new Training();
 
+        // checks for changes made to other trainings.
+        // prompts user to save changes if any.
         refreshTraining();
         
         SwingUtilities.invokeLater(new Runnable() {
@@ -1348,7 +1437,7 @@ public class ItemDialog extends javax.swing.JDialog {
                     trainingDialog.setTitle("Add new Training");
                     trainingDialog.setVisible(true);
                     
-
+                    // refreshes the view to reflect addition of training.
                     refreshTraining();
 
             }
@@ -1356,8 +1445,7 @@ public class ItemDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_addTrainingButtonActionPerformed
 
     private void deleteTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteTrainingButtonActionPerformed
-        // TODO add delete training button handling code here:
-        
+               
         final ItemDialog frame = this;
         final Inventory inventory = currentInventory.get(0);
         final Item item = currentItem.get(0);
@@ -1367,6 +1455,7 @@ public class ItemDialog extends javax.swing.JDialog {
             public void run()
             {
                 TrainingTableModel model = (TrainingTableModel) trainingTable.getModel();
+                // prompts the user to slect a training to delete if no selection is made.
                 int row = trainingTable.getSelectedRow();
                 if (row == -1){
                         JOptionPane.showMessageDialog(frame,
@@ -1377,7 +1466,7 @@ public class ItemDialog extends javax.swing.JDialog {
                 else
                  {
                         Training training = editTrainingRequest(row);
-                       // TODO add delete Location handling code here:
+                       // obtains user confirmation regarding delete
                         
                         String msg = "Are sure to delete this training?";
 
@@ -1395,11 +1484,14 @@ public class ItemDialog extends javax.swing.JDialog {
                         {
                             try
                             {
-
+                                // if user confirms delete,
+                                // checks for changes made to other trainings
+                                // and prompts the user to save them.
                                 refreshTraining();
 
                                 ArrayList<Training> itemTrainings = new ArrayList<Training>();
 
+                                // removes the selected training from the item training list.
                                 for (Training itemTraining: item.getTrainings()){
 
                                     if(itemTraining.getId().toString().equals(training.getId().toString()))
@@ -1416,12 +1508,9 @@ public class ItemDialog extends javax.swing.JDialog {
                                 item.getTrainings().clear();
                                 item.setTrainings(itemTrainings);
 
-
-
-
                                 inventory.insert(item);
                                 System.out.println(item.getId());
-
+                                // updates the item with changes item training list
                                 if (!Helper.insert(item, "Inventories", context)) {
                                     System.out.println("insert Item into Inventory failed!");
                                     return;
@@ -1432,6 +1521,7 @@ public class ItemDialog extends javax.swing.JDialog {
 
                                 System.out.println(item.getId());
 
+                                // deletes the training from the trainings repository
                                 if (!Helper.delete(training, "Trainings", context)) {
                                     System.out.print("Delete failed!");
                                 }
@@ -1444,6 +1534,7 @@ public class ItemDialog extends javax.swing.JDialog {
 
                        }
                       }
+                        // refreshes the view.
                          refreshTraining();
                          model.fireTableDataChanged();
                     }
@@ -1459,6 +1550,7 @@ public class ItemDialog extends javax.swing.JDialog {
          final Inventory inventory = currentInventory.get(0);
          final Item item = currentItem.get(0);
          final OrderAudit order = new OrderAudit();
+         // checks and prompts the user to save changes made to other orders.
          refreshOrder();
 
          SwingUtilities.invokeLater(new Runnable() {
@@ -1472,6 +1564,7 @@ public class ItemDialog extends javax.swing.JDialog {
                     orderingDialog.setTitle("Add new order");
                     orderingDialog.setVisible(true);
 
+                    // refreshes the view reflecting new changes.
                     refreshOrder();
 
                 } catch (Exception e) {
@@ -1488,13 +1581,12 @@ public class ItemDialog extends javax.swing.JDialog {
         final  Item item = currentItem.get(0);
         final  Inventory inventory = currentInventory.get(0);
        
-       //refreshStock();
-
         SwingUtilities.invokeLater(new Runnable() {
 
 
             public void run() {
 
+                // Prompts the user to slect a row if no selection is made.
                 int row = stockTable.getSelectedRow();
                 if (row == -1){
 
@@ -1514,6 +1606,7 @@ public class ItemDialog extends javax.swing.JDialog {
                         stockDialog.setVisible(true);
                         stockDialog.setTitle("Edit stock");
 
+                        // refreshes the view with new changes.
                         refreshStock();
                 }
             }
@@ -1524,7 +1617,7 @@ public class ItemDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void drillDownTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownTrainingButtonActionPerformed
-        // TODO add your handling code here:
+        
         final ItemDialog frame = this;
         final Inventory inventory = currentInventory.get(0);
         final Item item = currentItem.get(0);
@@ -1533,7 +1626,8 @@ public class ItemDialog extends javax.swing.JDialog {
 
 
             public void run() {
-
+                // retrieves the selected row from the table.
+                // If no selection is made then prompts the user to select a training.
                 int row = trainingTable.getSelectedRow();
                 if (row == -1){
 
@@ -1545,10 +1639,12 @@ public class ItemDialog extends javax.swing.JDialog {
                 }
                 else
                  {
-                        // Displays add stock dialog
+                        // Displays add training dialog
                         Training training = new Training();
                         training = editTrainingRequest(row);
 
+                        // check and prompts the user to save the changes
+                        // made to the other training requests.
                         refreshTraining();
 
                         AddTrainingDialog stockDialog =
@@ -1556,7 +1652,8 @@ public class ItemDialog extends javax.swing.JDialog {
 
                         stockDialog.setTitle("Edit training");
                         stockDialog.setVisible(true);
-                        
+
+                        // refreshes the view with new data.
                         refreshTraining();
                 }
             }
@@ -1565,7 +1662,7 @@ public class ItemDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_drillDownTrainingButtonActionPerformed
 
     private void drillDownOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drillDownOrderButtonActionPerformed
-        // TODO add your handling code here:
+      
         final ItemDialog frame = this;
         final Inventory inventory = currentInventory.get(0);
         final Item item = currentItem.get(0);
@@ -1575,6 +1672,8 @@ public class ItemDialog extends javax.swing.JDialog {
 
             public void run() {
 
+                // gets the selected row from the table. If no row is selected
+                // prompts the user to make a selection.
                 int row = ordersTable.getSelectedRow();
                 if (row == -1){
 
@@ -1587,10 +1686,12 @@ public class ItemDialog extends javax.swing.JDialog {
                 }
                 else
                  {
-                        // Displays add stock dialog
+                        // Displays add order dialog
                         OrderAudit order = new OrderAudit();
                         order = editOrdersRequest(row);
 
+                        // check if there are any changes to other orders.
+                        // prompts the user to save the saves before going to edit dialog.
                         refreshOrder();
 
                         AddOrderingDialog orderDialog =
@@ -1599,6 +1700,8 @@ public class ItemDialog extends javax.swing.JDialog {
                         orderDialog.setTitle("Edit Order");
                         orderDialog.setVisible(true);
                         
+
+                        // refreshes the view with new order data.
 
                         refreshOrder();
                 }

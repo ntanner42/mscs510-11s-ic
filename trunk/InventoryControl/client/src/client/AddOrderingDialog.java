@@ -56,7 +56,7 @@ public class AddOrderingDialog extends javax.swing.JDialog {
             this.setTitle("Edit order");
         }
 
-        // custom initialization for add stock.
+        // custom initialization for add order.
         init(order);
     }
 
@@ -246,8 +246,7 @@ public class AddOrderingDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_sizeTextFieldActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        // TODO add your handling code here:
-
+       
         String orderDate = orderingDateTextField.getText().toString();
         String size = sizeTextField.getText().toString();
         String poNumber = poNumberTextField.getText().toString();
@@ -258,7 +257,7 @@ public class AddOrderingDialog extends javax.swing.JDialog {
         OrderAudit newOrder = currentOrder.get(0);
 
         String errorMessage = "";
-
+        // validates the user entries in the text fields and combo boxes.
         if(orderDate.equals("")  || orderDate.isEmpty())
         {
             errorMessage += "Please select a order date.\n";
@@ -311,6 +310,9 @@ public class AddOrderingDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_saveButtonActionPerformed
 
 
+   /** This method inserts the order passed into the order repository.
+     * The method also included the order in the item order list and updates the item.
+     */
     private void insertOrder(OrderAudit newOrder){
 
         final AddOrderingDialog frame = this;
@@ -332,6 +334,11 @@ public class AddOrderingDialog extends javax.swing.JDialog {
          int orderID = newOrder.getId();
          boolean trainingExists = false;
 
+         //gets the items order history array list.
+         // checks if the order is already present in it.
+         // if it is not present it adds the new order to the item order list.
+         // and inserts new order to orders repository.
+         // if it exisits it proceeds to update the existing order
          if(!(item.getOrderHistory().isEmpty() ))
          {
             for(int i=0; i < item.getOrderHistory().size();i++)
