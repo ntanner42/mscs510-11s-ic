@@ -1,0 +1,34 @@
+# The properties below are defined for the Grounds dept.
+#system.name ns
+#system.repos.0 org.workplicity.server.repos.Accounts
+#system.repos.1 org.workplicity.server.repos.Clearinghouse
+#system.repos.2 org.workplicity.server.repos.Services
+#system.repos.3 org.workplicity.server.repos.WorkSlates
+#system.repos.4 org.workplicity.server.repos.Futures
+#system.user.0 admin gaze11e org.workplicity.entry.User
+#system.user.1 system impa1a org.workplicity.entry.User
+#system.service.admin Admin worklet_admin.xml
+#system.sweep.trans.0 org.workplicity.server.store.trans.SweepTransaction
+
+# The properties below are defined for the CIA
+system.name nl
+system.repos.0 org.workplicity.elog.repos.Elogs
+system.repos.1 org.workplicity.elog.repos.Handoffs
+system.repos.2 org.workplicity.elog.repos.Trades
+system.repos.3 org.workplicity.elog.repos.Accounts
+system.repos.4 org.workplicity.server.repos.Services
+system.repos.5 org.workplicity.elog.repos.Links
+system.repos.6 org.workplicity.inventorycontrol.repos.Inventories
+system.repos.7 org.workplicity.inventorycontrol.entry.Inventory
+system.repos.8 org.workplicity.inventorycontrol.entry.Item
+system.repos.9 org.workplicity.inventorycontrol.repos.Trainings
+system.repos.10 org.workplicity.inventorycontrol.repos.Events
+system.repos.11 org.workplicity.inventorycontrol.repos.Locations
+system.repos.12 org.workplicity.inventorycontrol.repos.Operations
+system.repos.13 org.workplicity.inventorycontrol.repos.Orders
+system.repos.14 org.workplicity.inventorycontrol.repos.Parts
+
+
+system.user.0 admin gaze11e org.workplicity.elog.entry.ElogUser
+system.user.1 system impa1a org.workplicity.elog.entry.ElogUser
+system.service.admin Admin worklet_admin.xml
